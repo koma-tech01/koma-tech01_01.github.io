@@ -298,8 +298,8 @@ function hideLoading() { document.getElementById('loading').classList.remove('sh
  * ログイン
  * ============================ */
 function doLogin() {
-  const userId = login-userId.value.trim();
-  const password = login-password.value.trim();
+  const userId = document.getElementById('login-userId').value.trim();
+  const password = document.getElementById('login-password').value.trim();
   const err = document.getElementById('login-error');
 
   if (!userId || !password) {
@@ -312,14 +312,23 @@ function doLogin() {
     .then(r => {
       hideLoading();
       if (!r.success) {
-        err.textContent = r.message;
+        err.textContent = r.message || 'ログイン失敗';
         return;
       }
+
       currentUser = r;
-      login.style.display = 'none';
-      main-nav.style.display = 'flex';
-      user-info.textContent = `${r.userName} (${r.userType})`;
+
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('main-nav').style.display = 'flex';
+      document.getElementById('user-info').textContent =
+        `${r.userName} (${r.userType})`;
+
       loadBugsFromServer();
+    })
+    .catch(e => {
+      hideLoading();
+      err.textContent = '通信エラー';
+      console.error(e);
     });
 }
 
