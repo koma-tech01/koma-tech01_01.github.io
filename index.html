@@ -276,7 +276,6 @@
   function callGAS(action, payload) {
     return fetch(GAS_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, payload })
     }).then(r => r.json());
   }
