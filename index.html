@@ -281,7 +281,7 @@
   }
 
   //============================
-  // グローバル変数（変更なし）
+  // グローバル変数
   //============================
   let currentUser = null;
   let bugsCache = [];
@@ -378,13 +378,37 @@
   }
 
   //============================
-  // 画面遷移（完全維持）
+  // 画面遷移
   //============================
   function go(hash) { location.hash = hash; }
+
+  function clearNewForm() {
+    const ids = ['new-title', 'new-desc', 'new-labels', 'new-env', 'new-version', 'new-repro', 'new-related', 'new-assignee'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+    // 起票者を現在のユーザー名に設定
+    const reporterEl = document.getElementById('new-reporter');
+    if (reporterEl && currentUser) {
+      reporterEl.value = currentUser.userName;
+    }
+
+    const status = document.getElementById('new-status');
+    if (status) status.value = 'OPEN(新規)';
+
+    const priority = document.getElementById('new-priority');
+    if (priority) priority.value = 'High';
+
+    const severity = document.getElementById('new-severity');
+    if (severity) severity.selectedIndex = 0;
+  }
 
   function route() {
     if (!window.__booted) {
       window.__booted = true;
+      document.getElementById('login').style.display = 'block';
       document.getElementById('login').classList.add('active');
       return;
     }
@@ -408,6 +432,12 @@
       pg.style.display = 'block';
     }
 
+    const navNew = document.getElementById('nav-new');
+    if (navNew) {
+      navNew.style.display = (clean === '#new' || clean === '#detail') ? 'none' : 'inline-block';
+    }
+
+    if (clean === '#new') clearNewForm();
     if (clean === '#list') renderList();
     if (clean === '#detail' && hash.includes('/')) {
       showDetail(hash.split('/')[1]);
@@ -418,26 +448,41 @@
   window.addEventListener('load', route);
 
   //============================
-  // 一覧表示（変更なし）
+  // 一覧表示（検索機能修正）
   //============================
   function renderList() {
+    const search = (document.getElementById('search') || { value: '' }).value.toLowerCase();
     const tbody = document.querySelector('#bugTable tbody');
     tbody.innerHTML = '';
 
-    bugsCache.forEach((b, i) => {
+    const sorted = bugsCache.slice().sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    const filtered = sorted.filter(b => JSON.stringify(b).toLowerCase().includes(search));
+
+    if (filtered.length === 0) {
+      const tr = document.createElement('tr');
+      tr.className = 'empty-row';
+      tr.innerHTML = '<td colspan="6">表示する項目がありません</td>';
+      tbody.appendChild(tr);
+      return;
+    }
+
+    filtered.forEach((b, idx) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${i + 1}</td>
+        <td>${idx + 1}</td>
         <td>${b.title || ''}</td>
         <td>${b.status || ''}</td>
         <td>${b.severity || ''}</td>
         <td>${b.priority || ''}</td>
-        <td>${(b.labels || []).join(', ')}</td>
-      `;
-      tr.onclick = () => go(`#detail/${b.id}`);
+        <td>${(b.labels || []).join(', ')}</td>`;
+      tr.addEventListener('click', () => { go(`#detail/${b.id}`); });
       tbody.appendChild(tr);
     });
   }
+
+  // 検索機能の有効化
+  const searchEl = document.getElementById('search');
+  if (searchEl) searchEl.oninput = renderList;
 
   function escapeHtml(s) {
     return (s || '').replace(/[&<>"']/g, c =>
@@ -449,8 +494,13 @@
   // 新規登録
   //============================
   function addBug() {
+    if (!currentUser) {
+      alert('ログインしてください');
+      return;
+    }
+
     const b = {
-      id: 'b_' + Math.random().toString(36).slice(2),
+      id: 'b_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now(),
       title: document.getElementById('new-title').value,
       description: document.getElementById('new-desc').value,
       status: document.getElementById('new-status').value,
@@ -464,8 +514,12 @@
       version: document.getElementById('new-version').value,
       reproducibility: document.getElementById('new-repro').value,
       related: document.getElementById('new-related').value,
+      cause: '',
+      fixPlan: '',
+      impact: '',
+      note: '',
       comments: [],
-      history: [{ type: 'create', at: new Date().toISOString() }],
+      history: [{ type: 'create', at: new Date().toISOString(), data: {} }],
       createdAt: new Date().toISOString()
     };
 
@@ -474,71 +528,415 @@
       .then(r => {
         hideLoading();
         if (!r.success) {
-          alert(r.message);
+          alert(r.message || '保存に失敗しました');
           return;
         }
+        alert('登録しました');
         loadBugsFromServer();
+      })
+      .catch(e => {
+        hideLoading();
+        alert('エラーが発生しました: ' + e.message);
       });
   }
 
   //============================
-  // 詳細・コメント・履歴
-  // 👉 ロジック完全維持、保存だけ fetch
+  // 詳細画面表示（修正版）
+  //============================
+  function showDetail(id) {
+    const b = bugsCache.find(x => x.id === id);
+    currentDetailId = id;
+    const area = document.getElementById('detail-content');
+
+    if (!b) {
+      area.innerHTML = '<p>見つかりません</p>';
+      return;
+    }
+
+    b.comments = b.comments || [];
+    b.history = b.history || [];
+
+    area.innerHTML = `
+      <h2 style="margin-bottom:12px;">バグ詳細</h2>
+
+      <label>タイトル</label>
+      <input id="detail-title" value="${escapeHtml(b.title || '')}" />
+
+      <label>説明</label>
+      <textarea id="detail-desc" rows="6">${escapeHtml(b.description || '')}</textarea>
+
+      <label>ステータス</label>
+      <select id="detail-status" style="width:260px;">
+        <option ${b.status === 'OPEN(新規)' ? 'selected' : ''}>OPEN(新規)</option>
+        <option ${b.status === 'ACCEPT(アサイン済み)' ? 'selected' : ''}>ACCEPT(アサイン済み)</option>
+        <option ${b.status === 'RESOLVED(対象方法確定)' ? 'selected' : ''}>RESOLVED(対象方法確定)</option>
+        <option ${b.status === 'FIXED(修正済み)' ? 'selected' : ''}>FIXED(修正済み)</option>
+        <option ${b.status === 'CLOSED(解消)' ? 'selected' : ''}>CLOSED(解消)</option>
+        <option ${b.status === 'INVALID(不具合ではない)' ? 'selected' : ''}>INVALID(不具合ではない)</option>
+        <option ${b.status === 'WONTFIX(仕様扱い)' ? 'selected' : ''}>WONTFIX(仕様扱い)</option>
+        <option ${b.status === 'DUPLICATE(重複している不具合)' ? 'selected' : ''}>DUPLICATE(重複している不具合)</option>
+        <option ${b.status === 'WORKSFORME(再現しない)' ? 'selected' : ''}>WORKSFORME(再現しない)</option>
+        <option ${b.status === 'LATER(次期バージョンで対応)' ? 'selected' : ''}>LATER(次期バージョンで対応)</option>
+        <option ${b.status === 'REMIND(制限事項扱い)' ? 'selected' : ''}>REMIND(制限事項扱い)</option>
+        <option ${b.status === 'REOPENED(再オープン)' ? 'selected' : ''}>REOPENED(再オープン)</option>
+      </select>
+
+      <label>ラベル（カンマ区切り）</label>
+      <input id="detail-labels" value="${escapeHtml((b.labels || []).join(', '))}" />
+
+      <label>起票者</label>
+      <input id="detail-reporter" value="${escapeHtml(b.reporterName || b.reporter || '')}" readonly style="background:#0f1724;cursor:not-allowed;" />
+
+      <label>重要度</label>
+      <select id="detail-severity" style="width:200px;">
+        <option value="S(致命的)" ${b.severity === 'S(致命的)' ? 'selected' : ''}>S(致命的)</option>
+        <option value="A(機能上問題（回避策なし）)" ${b.severity === 'A(機能上問題（回避策なし）)' ? 'selected' : ''}>A(機能上問題（回避策なし）)</option>
+        <option value="B(機能上問題（回避策あり）)" ${b.severity === 'B(機能上問題（回避策あり）)' ? 'selected' : ''}>B(機能上問題（回避策あり）)</option>
+        <option value="C(商品性上問題)" ${b.severity === 'C(商品性上問題)' ? 'selected' : ''}>C(商品性上問題)</option>
+        <option value="D(軽微)" ${b.severity === 'D(軽微)' ? 'selected' : ''}>D(軽微)</option>
+      </select>
+
+      <label>担当者</label>
+      <input id="detail-assignee" value="${escapeHtml(b.assignee || '')}" />
+
+      <label>優先度</label>
+      <select id="detail-priority" style="width:120px;">
+        <option value="High" ${b.priority === 'High' ? 'selected' : ''}>High</option>
+        <option value="Medium" ${b.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+        <option value="Low" ${b.priority === 'Low' ? 'selected' : ''}>Low</option>
+      </select>
+
+      <label>テスト環境</label>
+      <input id="detail-env" value="${escapeHtml(b.environment || '')}" />
+
+      <label>バージョン情報</label>
+      <input id="detail-version" value="${escapeHtml(b.version || '')}" />
+
+      <label>再現性</label>
+      <input id="detail-repro" value="${escapeHtml(b.reproducibility || '')}" />
+
+      <label>関連チケット</label>
+      <input id="detail-related" value="${escapeHtml(b.related || '')}" />
+
+      <label>不具合原因（開発者記入）</label>
+      <textarea id="detail-cause" rows="4">${escapeHtml(b.cause || '')}</textarea>
+
+      <label>修正方針・内容（開発者記入）</label>
+      <textarea id="detail-fixplan" rows="4">${escapeHtml(b.fixPlan || '')}</textarea>
+
+      <label>影響範囲（開発者記入）</label>
+      <textarea id="detail-impact" rows="4">${escapeHtml(b.impact || '')}</textarea>
+
+      <label>備考（開発者記入）</label>
+      <textarea id="detail-note" rows="4">${escapeHtml(b.note || '')}</textarea>
+
+      <h3 style="margin-top:16px;">変更履歴</h3>
+      <div id="detail-history" style="font-size:13px; color:#cbd5e1; background:rgba(255,255,255,0.03); padding:8px; border-radius:8px; max-height:200px; overflow:auto;"></div>
+
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn" onclick="saveDetail('${b.id}')">保存</button>
+        <button class="btn" onclick="go('#list')">戻る</button>
+      </div>
+    `;
+
+    renderHistory(b);
+    renderComments(b);
+    
+    // コメント入力欄をクリア
+    const commentInput = document.getElementById('comment-input');
+    if (commentInput) commentInput.value = '';
+  }
+
+  //============================
+  // 詳細保存
   //============================
   function saveDetail(id) {
+    if (!currentUser) {
+      alert('ログインしてください');
+      return;
+    }
+
     const b = bugsCache.find(x => x.id === id);
-    if (!b) return;
+    if (!b) {
+      alert('対象データが見つかりません');
+      return;
+    }
+
+    const before = JSON.parse(JSON.stringify(b));
+
+    const v = (id) => {
+      const el = document.getElementById(id);
+      return el ? el.value : '';
+    };
+
+    b.title = v('detail-title');
+    b.description = v('detail-desc');
+    b.status = v('detail-status');
+    b.severity = v('detail-severity');
+    b.priority = v('detail-priority');
+    b.labels = v('detail-labels').split(',').map(x => x.trim()).filter(x => x);
+    b.assignee = v('detail-assignee');
+    b.environment = v('detail-env');
+    b.version = v('detail-version');
+    b.reproducibility = v('detail-repro');
+    b.related = v('detail-related');
+    b.cause = v('detail-cause');
+    b.fixPlan = v('detail-fixplan');
+    b.impact = v('detail-impact');
+    b.note = v('detail-note');
+
+    // 変更履歴を記録
+    const changes = [];
+    const FIELD_LABELS = {
+      title: 'タイトル',
+      description: '説明',
+      status: 'ステータス',
+      severity: '重要度',
+      priority: '優先度',
+      assignee: '担当者',
+      environment: 'テスト環境',
+      version: 'バージョン情報',
+      reproducibility: '再現性',
+      related: '関連チケット',
+      cause: '不具合原因',
+      fixPlan: '修正方針・内容',
+      impact: '影響範囲',
+      note: '備考'
+    };
+
+    Object.keys(FIELD_LABELS).forEach(k => {
+      if (typeof b[k] === 'string' && before[k] !== b[k]) {
+        changes.push({
+          field: k,
+          from: before[k] || '',
+          to: b[k] || ''
+        });
+      }
+    });
+
+    if (changes.length) {
+      b.history = b.history || [];
+      b.history.push({
+        type: 'edit',
+        at: new Date().toISOString(),
+        changes: changes,
+        user: currentUser.userName
+      });
+    }
 
     showLoading();
     callGAS('saveBug', { bug: b, userId: currentUser.userId })
       .then(r => {
         hideLoading();
         if (!r.success) {
-          alert(r.message);
+          alert(r.message || '保存に失敗しました');
           return;
         }
+        alert('保存しました');
         loadBugsFromServer();
+      })
+      .catch(e => {
+        hideLoading();
+        alert('エラーが発生しました: ' + e.message);
       });
   }
 
+  //============================
+  // 変更履歴表示
+  //============================
+  function renderHistory(b) {
+    const box = document.getElementById('detail-history');
+    if (!box) return;
+
+    box.innerHTML = '';
+
+    if (!b.history || b.history.length === 0) {
+      box.textContent = '変更履歴はありません';
+      return;
+    }
+
+    const FIELD_LABELS = {
+      title: 'タイトル',
+      description: '説明',
+      status: 'ステータス',
+      severity: '重要度',
+      priority: '優先度',
+      reporter: '起票者',
+      assignee: '担当者',
+      labels: 'ラベル',
+      environment: 'テスト環境',
+      version: 'バージョン情報',
+      reproducibility: '再現性',
+      related: '関連チケット',
+      cause: '不具合原因',
+      fixPlan: '修正方針・内容',
+      impact: '影響範囲',
+      note: '備考'
+    };
+
+    b.history.slice().reverse().forEach(h => {
+      const wrap = document.createElement('div');
+      wrap.style.marginBottom = '8px';
+
+      const time = document.createElement('div');
+      time.style.fontSize = '12px';
+      time.style.color = '#9aa4b2';
+      time.textContent = new Date(h.at).toLocaleString() + (h.user ? ' - ' + h.user : '');
+
+      const body = document.createElement('div');
+
+      if (h.type === 'create') {
+        body.textContent = '新規作成';
+      }
+
+      if (h.type === 'edit' && Array.isArray(h.changes)) {
+        const ul = document.createElement('ul');
+        ul.style.marginLeft = '20px';
+        h.changes.forEach(c => {
+          const li = document.createElement('li');
+          if (typeof c === 'string') {
+            const key = c.split(':')[0];
+            const label = FIELD_LABELS[key] || key;
+            li.textContent = c.replace(key, label);
+          } else {
+            const label = FIELD_LABELS[c.field] || c.field;
+            li.textContent = `${label}：${c.from || '(空)'} → ${c.to || '(空)'}`;
+          }
+          ul.appendChild(li);
+        });
+        body.appendChild(document.createTextNode('編集'));
+        body.appendChild(ul);
+      }
+
+      wrap.appendChild(time);
+      wrap.appendChild(body);
+      box.appendChild(wrap);
+    });
+  }
+
+  //============================
+  // コメント表示
+  //============================
+  function renderComments(b) {
+    const list = document.getElementById('comment-list');
+    const collapsed = document.getElementById('comment-collapsed');
+    if (!list || !collapsed) return;
+
+    const cs = (b.comments || []).slice().sort((a, c) => new Date(c.createdAt) - new Date(a.createdAt));
+
+    if (!cs.length) {
+      collapsed.textContent = 'コメントはありません';
+      collapsed.style.display = 'block';
+      list.style.display = 'none';
+      return;
+    }
+
+    collapsed.textContent = cs[0].text;
+    collapsed.style.display = commentsExpanded[b.id] ? 'none' : 'block';
+    list.innerHTML = '';
+    list.style.display = commentsExpanded[b.id] ? 'block' : 'none';
+
+    cs.forEach(c => {
+      const d = document.createElement('div');
+      d.className = 'comment-item';
+      d.innerHTML = `
+        <div style="flex:1;">
+          <div class="comment-text">${escapeHtml(c.text)}</div>
+          <div class="comment-meta">${new Date(c.createdAt).toLocaleString()}${c.userName ? ' - ' + c.userName : ''}</div>
+        </div>
+        <button class="btn" onclick="deleteComment('${b.id}','${c.id}')">削除</button>`;
+      list.appendChild(d);
+    });
+  }
+
+  //============================
+  // コメント展開/折りたたみ
+  //============================
+  function toggleComments(id) {
+    commentsExpanded[id] = !commentsExpanded[id];
+    const b = bugsCache.find(x => x.id === id);
+    if (b) renderComments(b);
+  }
+
+  //============================
+  // コメント追加
+  //============================
   function addComment(id) {
+    if (!currentUser) {
+      alert('ログインしてください');
+      return;
+    }
+
+    const ta = document.getElementById('comment-input');
+    if (!ta) return;
+
+    const t = ta.value.trim();
+    if (!t) {
+      alert('コメントを入力してください');
+      return;
+    }
+
     const b = bugsCache.find(x => x.id === id);
     if (!b) return;
 
-    const ta = document.getElementById('comment-input');
-    const text = ta.value.trim();
-    if (!text) return;
-
+    b.comments = b.comments || [];
     b.comments.push({
-      id: 'c_' + Math.random().toString(36).slice(2),
-      text,
+      id: 'c_' + Math.random().toString(36).slice(2, 9),
+      text: t,
       userName: currentUser.userName,
       createdAt: new Date().toISOString()
     });
 
-    commentsExpanded[id] = true;
     ta.value = '';
+    commentsExpanded[id] = true;
 
     showLoading();
     callGAS('saveBug', { bug: b, userId: currentUser.userId })
-      .then(() => {
+      .then(r => {
         hideLoading();
+        if (!r.success) {
+          alert(r.message || 'コメントの保存に失敗しました');
+          return;
+        }
         renderComments(b);
+      })
+      .catch(e => {
+        hideLoading();
+        alert('エラーが発生しました: ' + e.message);
       });
   }
 
+  //============================
+  // コメント削除
+  //============================
   function deleteComment(bugId, cid) {
+    if (!currentUser) {
+      alert('ログインしてください');
+      return;
+    }
+
+    if (!confirm('このコメントを削除しますか？')) {
+      return;
+    }
+
     const b = bugsCache.find(x => x.id === bugId);
     if (!b) return;
 
-    if (!confirm('このコメントを削除しますか？')) return;
     b.comments = b.comments.filter(c => c.id !== cid);
 
     showLoading();
     callGAS('saveBug', { bug: b, userId: currentUser.userId })
-      .then(() => {
+      .then(r => {
         hideLoading();
+        if (!r.success) {
+          alert(r.message || 'コメントの削除に失敗しました');
+          return;
+        }
         renderComments(b);
+      })
+      .catch(e => {
+        hideLoading();
+        alert('エラーが発生しました: ' + e.message);
       });
   }
 </script>
