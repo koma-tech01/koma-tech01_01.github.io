@@ -663,7 +663,16 @@
         }
         alert('保存しました');
         isEditMode = false;
-        loadBugsFromServer();
+        
+        // bugsCache内のデータを更新
+        const index = bugsCache.findIndex(x => x.id === id);
+        if (index !== -1) {
+          bugsCache[index] = b;
+        }
+        
+        // 詳細画面を表示モードで再描画
+        renderDetailContent(b, false);
+        renderHistory(b);
       })
       .catch(e => {
         hideLoading();
@@ -930,7 +939,17 @@
     const readonlyStyle = editMode ? '' : 'background:#0f1724;cursor:not-allowed;';
 
     area.innerHTML = `
-      <h2 style="margin-bottom:12px;">バグ詳細</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0;">バグ詳細</h2>
+        <div style="display:flex; gap:8px;">
+          ${editMode ? 
+            `<button class="btn" onclick="saveDetail('${b.id}')">保存</button>
+             <button class="btn" onclick="cancelEdit('${b.id}')">キャンセル</button>` :
+            `<button class="btn" onclick="toggleEditMode('${b.id}')">編集</button>
+             <button class="btn" onclick="go('#list')">戻る</button>`
+          }
+        </div>
+      </div>
 
       <label class="required">タイトル</label>
       <input id="detail-title" value="${escapeHtml(b.title || '')}" ${disabled} style="${readonlyStyle}" />
@@ -1005,15 +1024,6 @@
 
       <h3 style="margin-top:16px;">変更履歴</h3>
       <div id="detail-history" style="font-size:13px; color:#cbd5e1; background:rgba(255,255,255,0.03); padding:8px; border-radius:8px; max-height:200px; overflow:auto;"></div>
-
-      <div style="display:flex; gap:8px; margin-top:8px;">
-        ${editMode ? 
-          `<button class="btn" onclick="saveDetail('${b.id}')">保存</button>
-           <button class="btn" onclick="cancelEdit('${b.id}')">キャンセル</button>` :
-          `<button class="btn" onclick="toggleEditMode('${b.id}')">編集</button>
-           <button class="btn" onclick="go('#list')">戻る</button>`
-        }
-      </div>
     `;
   }
 
