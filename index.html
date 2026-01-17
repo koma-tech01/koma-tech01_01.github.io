@@ -291,7 +291,7 @@
   //============================
   // 設定
   //============================
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyrXoWTTy8FI-bKGw1TnyAm756tJRGqQX-BSmYWR2B1VBB8B9rc14Tkr0zUvzwgi3DJ/exec';
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyclXthyvgLnrVXWq_xx-h8d-2HDZecwUCsNnTeQs5XhCsFKLA-FMvb7VGDQeY9iK2H/exec';
 
   function callGAS(action, payload) {
     console.log('callGAS - action:', action, 'payload:', payload);
@@ -423,7 +423,11 @@
         console.log('Bug reporters:', bugsCache.map(b => ({ id: b.id, reporter: b.reporter, reporterName: b.reporterName })));
         
         go('#list');
-        renderList(); // 明示的に一覧を描画
+        // 画面遷移後に確実にスクロール
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          renderList();
+        }, 100);
       })
       .catch(e => {
         hideLoading();
@@ -521,7 +525,10 @@
   //============================
   function renderList() {
     console.log('renderList called, bugsCache:', bugsCache); // デバッグ用
-    const search = (document.getElementById('search') || { value: '' }).value.toLowerCase();
+    const searchInput = document.getElementById('search');
+    const search = searchInput ? searchInput.value.toLowerCase() : '';
+    console.log('Search query:', search); // デバッグ用
+    
     const tbody = document.querySelector('#bugTable tbody');
     
     if (!tbody) {
@@ -532,9 +539,26 @@
     tbody.innerHTML = '';
 
     const sorted = bugsCache.slice().sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    const filtered = sorted.filter(b => JSON.stringify(b).toLowerCase().includes(search));
+    
+    // 検索フィルタ
+    const filtered = sorted.filter(b => {
+      if (!search) return true; // 検索語がない場合は全て表示
+      
+      const searchFields = [
+        b.title || '',
+        b.description || '',
+        b.status || '',
+        b.severity || '',
+        b.priority || '',
+        b.assignee || '',
+        b.reporterName || '',
+        (b.labels || []).join(' ')
+      ].join(' ').toLowerCase();
+      
+      return searchFields.includes(search);
+    });
 
-    console.log('Filtered bugs:', filtered.length); // デバッグ用
+    console.log('Filtered bugs:', filtered.length, 'out of', sorted.length); // デバッグ用
 
     if (filtered.length === 0) {
       const tr = document.createElement('tr');
