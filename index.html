@@ -284,7 +284,7 @@
   //============================
   // 設定
   //============================
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxhUVdccXWB5GNeKFjjvV9IgkrmTIrB0rPUEy5HLEUUALaGOa0im7r2aMPUxEI86VrX/exec';
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycby5z3YXUW3cxtDM2xNpatDfEIKGvR3vy9ZwvNZNAIZ83LskSfDafEqLx2gCHsmRUjcg/exec';
 
   function callGAS(action, payload) {
     return fetch(GAS_ENDPOINT, {
@@ -383,7 +383,9 @@
           return;
         }
         bugsCache = result.bugs || [];
+        console.log('Loaded bugs:', bugsCache); // デバッグ用
         go('#list');
+        renderList(); // 明示的に一覧を描画
       })
       .catch(e => {
         hideLoading();
@@ -451,10 +453,17 @@
       navNew.style.display = (clean === '#new' || clean === '#detail') ? 'none' : 'inline-block';
     }
 
-    if (clean === '#new') clearNewForm();
-    if (clean === '#list') renderList();
+    if (clean === '#new') {
+      clearNewForm();
+    }
+    if (clean === '#list') {
+      console.log('Routing to list, bugs:', bugsCache.length); // デバッグ用
+      renderList();
+    }
     if (clean === '#detail' && hash.includes('/')) {
-      showDetail(hash.split('/')[1]);
+      const bugId = hash.split('/')[1];
+      console.log('Routing to detail:', bugId); // デバッグ用
+      showDetail(bugId);
     }
   }
 
@@ -465,12 +474,21 @@
   // 一覧表示（検索機能修正）
   //============================
   function renderList() {
+    console.log('renderList called, bugsCache:', bugsCache); // デバッグ用
     const search = (document.getElementById('search') || { value: '' }).value.toLowerCase();
     const tbody = document.querySelector('#bugTable tbody');
+    
+    if (!tbody) {
+      console.error('tbody not found');
+      return;
+    }
+    
     tbody.innerHTML = '';
 
     const sorted = bugsCache.slice().sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     const filtered = sorted.filter(b => JSON.stringify(b).toLowerCase().includes(search));
+
+    console.log('Filtered bugs:', filtered.length); // デバッグ用
 
     if (filtered.length === 0) {
       const tr = document.createElement('tr');
@@ -482,14 +500,18 @@
 
     filtered.forEach((b, idx) => {
       const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
       tr.innerHTML = `
         <td>${idx + 1}</td>
-        <td>${b.title || ''}</td>
-        <td>${b.status || ''}</td>
-        <td>${b.severity || ''}</td>
-        <td>${b.priority || ''}</td>
-        <td>${(b.labels || []).join(', ')}</td>`;
-      tr.addEventListener('click', () => { go(`#detail/${b.id}`); });
+        <td>${escapeHtml(b.title || '')}</td>
+        <td>${escapeHtml(b.status || '')}</td>
+        <td>${escapeHtml(b.severity || '')}</td>
+        <td>${escapeHtml(b.priority || '')}</td>
+        <td>${escapeHtml((b.labels || []).join(', '))}</td>`;
+      tr.addEventListener('click', () => { 
+        console.log('Clicked bug:', b.id); // デバッグ用
+        go(`#detail/${b.id}`); 
+      });
       tbody.appendChild(tr);
     });
   }
