@@ -14,6 +14,12 @@
     }
     select option { color:#000; background:#fff; }
 
+    /* ログイン画面の入力ボックスを明るくする */
+    .login-box input {
+      background:#3a4a5f;
+      border:1px solid #4a5a6f;
+    }
+
     .table-wrap { overflow:auto; }
     table { width:100%; border-collapse:collapse; margin-top:16px; table-layout:fixed; }
 
@@ -285,7 +291,7 @@
   //============================
   // 設定
   //============================
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycby7e1wEJeDOnWIFtHZi2Eba67G-XNINESfYzgBqH5Z2SsrqaAbRqkG1W-E8eNzsrN4i/exec';
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyrXoWTTy8FI-bKGw1TnyAm756tJRGqQX-BSmYWR2B1VBB8B9rc14Tkr0zUvzwgi3DJ/exec';
 
   function callGAS(action, payload) {
     console.log('callGAS - action:', action, 'payload:', payload);
@@ -429,7 +435,11 @@
   //============================
   // 画面遷移
   //============================
-  function go(hash) { location.hash = hash; }
+  function go(hash) { 
+    location.hash = hash;
+    // ページトップにスクロール
+    window.scrollTo(0, 0);
+  }
 
   function clearNewForm() {
     const ids = ['new-title', 'new-desc', 'new-labels', 'new-env', 'new-version', 'new-repro', 'new-related', 'new-assignee'];
@@ -455,6 +465,9 @@
   }
 
   function route() {
+    // ページトップにスクロール
+    window.scrollTo(0, 0);
+    
     if (!window.__booted) {
       window.__booted = true;
       document.getElementById('login').style.display = 'flex';
