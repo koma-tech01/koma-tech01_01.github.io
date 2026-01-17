@@ -168,7 +168,7 @@
   <section id="list">
     <h2>バグ一覧</h2>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-      <input id="search" type="text" placeholder="検索 (タイトル・説明・ラベル)" style="flex:1;min-width:220px;" />
+      <input id="search" type="text" placeholder="検索 (タイトル・説明・ラベル)" style="flex:1;min-width:220px;" onkeyup="renderList()" />
     </div>
 
     <div class="table-wrap">
@@ -291,7 +291,7 @@
   //============================
   // 設定
   //============================
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyclXthyvgLnrVXWq_xx-h8d-2HDZecwUCsNnTeQs5XhCsFKLA-FMvb7VGDQeY9iK2H/exec';
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzIXJlcWKWtSYdAnR-VzA-yacSQcxOm76CHS9qjGfQzBRbP1FsJXzaRtILD6NgmUtUy/exec';
 
   function callGAS(action, payload) {
     console.log('callGAS - action:', action, 'payload:', payload);
