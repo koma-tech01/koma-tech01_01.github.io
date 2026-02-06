@@ -129,53 +129,53 @@
       text-decoration: underline;
     }
     /* 関連チケット選択UI */
-　　.related-tickets-selector {
-  　　border: 1px solid #2c3a52;
-  　　border-radius: 8px;
-  　　padding: 8px;
-  　　max-height: 200px;
-  　　overflow-y: auto;
-  　　background: #1d2738;
-  　　margin-top: 4px;
-　　}
-　　.related-ticket-item {
-  　　padding: 6px 8px;
-  　　margin: 4px 0;
-  　　border-radius: 4px;
-  　　cursor: pointer;
-  　　background: rgba(255,255,255,0.03);
-  　　display: flex;
-  　　align-items: center;
-  　　gap: 8px;
-　　}
-　　.related-ticket-item:hover {
-  　　background: rgba(255,255,255,0.08);
-　　}
-　　.related-ticket-item.selected {
-  　　background: rgba(30,144,255,0.3);
-  　　border: 1px solid #1e90ff;
-　　}
-　　.related-ticket-checkbox {
-  　　width: 16px;
-  　　height: 16px;
-  　　border: 2px solid #2c3a52;
-  　　border-radius: 3px;
-  　　display: inline-block;
-  　　position: relative;
-  　　flex-shrink: 0;
-　　}
-　　.related-ticket-item.selected .related-ticket-checkbox {
-  　　background: #1e90ff;
-  　　border-color: #1e90ff;
-　　}
-　　.related-ticket-item.selected .related-ticket-checkbox::after {
-  　　content: '✓';
-  　　position: absolute;
-  　　top: -2px;
-  　　left: 2px;
-  　　color: white;
-  　　font-size: 12px;
-　　}
+    .related-tickets-selector {
+      border: 1px solid #2c3a52;
+      border-radius: 8px;
+      padding: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #1d2738;
+      margin-top: 4px;
+    }
+    .related-ticket-item {
+      padding: 6px 8px;
+      margin: 4px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .related-ticket-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .related-ticket-item.selected {
+      background: rgba(30,144,255,0.3);
+      border: 1px solid #1e90ff;
+    }
+    .related-ticket-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #2c3a52;
+      border-radius: 3px;
+      display: inline-block;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .related-ticket-item.selected .related-ticket-checkbox {
+      background: #1e90ff;
+      border-color: #1e90ff;
+    }
+    .related-ticket-item.selected .related-ticket-checkbox::after {
+      content: '✓';
+      position: absolute;
+      top: -2px;
+      left: 2px;
+      color: white;
+      font-size: 12px;
+    }
     @media (max-width:900px){ .detail-wrap{ flex-direction:column;} }
   </style>
 </head>
@@ -186,7 +186,7 @@
   <section id="login">
     <div class="login-box">
       <h2>🪷L.O.T.U.S</h2>
-    　<h4>Bug Tracking System</h4>
+      <h4>Bug Tracking System</h4>
         <p>
             <font size="1">
                 <i>
@@ -321,7 +321,7 @@
   let currentDetailId = null;
   let commentsExpanded = {};
   let isEditMode = false;
-　let navigationHistory = []; 
+  let navigationHistory = []; 
   function canEditDevFields() {
     if (!currentUser) return false;
     return currentUser.userType === 'admin';
@@ -434,7 +434,7 @@
     if (severity) severity.value = '';
     populateRelatedTickets('new-related-container', null, []);
   }
-　function populateRelatedTickets(containerId, currentBugId, selectedIds) {
+  function populateRelatedTickets(containerId, currentBugId, selectedIds) {
    const container = document.getElementById(containerId);
    if (!container) return;
    const selected = selectedIds || [];
@@ -445,12 +445,12 @@
      bugsCache.forEach(bug => {
        if (bug.id === currentBugId) return; // 自分自身は除外
        const isSelected = selected.includes(bug.id);
-       html += `
-         <div class="related-ticket-item ${isSelected ? 'selected' : ''}" 
-              onclick="toggleRelatedTicket('${containerId}', '${bug.id}')">
-           <span class="related-ticket-checkbox"></span>
-           <span>No.${bug.bugNo} - ${escapeHtml(bug.title)}</span>
-         </div>`;
+       html+=`
+<divclass="related-ticket-item${isSelected?'selected':''}"
+     onclick="toggleRelatedTicket('${containerId}','${bug.id}')">
+  <spanclass="related-ticket-checkbox"></span>
+  <span>No.${bug.bugNo}-${escapeHtml(bug.title)}</span>
+</div>`;
      });
    }
    html += '</div>';
