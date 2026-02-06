@@ -435,27 +435,33 @@
     populateRelatedTickets('new-related-container', null, []);
   }
   function populateRelatedTickets(containerId, currentBugId, selectedIds) {
-   const container = document.getElementById(containerId);
-   if (!container) return;
-   const selected = selectedIds || [];
-   let html = '<div class="related-tickets-selector">';
-   if (bugsCache.length === 0) {
-     html += '<div style="padding:8px;color:#9aa4b2;">関連付け可能なチケットがありません</div>';
-   } else {
-     bugsCache.forEach(bug => {
-       if (bug.id === currentBugId) return; // 自分自身は除外
-       const isSelected = selected.includes(bug.id);
-       html += `
-<div class="related-ticket-item ${isSelected ? 'selected' : ''}"
-     onclick="toggleRelatedTicket('${containerId}','${bug.id}')">
-  <span class="related-ticket-checkbox"></span>
-  <span>No.${bug.bugNo} - ${escapeHtml(bug.title)}</span>
-</div>`;
-     });
-   }
-   html += '</div>';
-   container.innerHTML = html;
- }
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const selected = selectedIds || [];
+  
+  let html = '<div class="related-tickets-selector">';
+  
+  if (bugsCache.length === 0) {
+    html += '<div style="padding:8px;color:#9aa4b2;">関連付け可能なチケットがありません</div>';
+  } else {
+    bugsCache.forEach(bug => {
+      if (bug.id === currentBugId) return;
+      
+      const isSelected = selected.includes(bug.id);
+      const selectedClass = isSelected ? ' selected' : '';
+      
+      html += '<div class="related-ticket-item' + selectedClass + '" ';
+      html += 'onclick="toggleRelatedTicket(\'' + containerId + '\',\'' + bug.id + '\')">';
+      html += '<span class="related-ticket-checkbox"></span>';
+      html += '<span>No.' + bug.bugNo + ' - ' + escapeHtml(bug.title) + '</span>';
+      html += '</div>';
+    });
+  }
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
 
 function toggleRelatedTicket(containerId, bugId) {
   const container = document.getElementById(containerId);
