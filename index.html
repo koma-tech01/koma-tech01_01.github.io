@@ -445,11 +445,11 @@
      bugsCache.forEach(bug => {
        if (bug.id === currentBugId) return; // 自分自身は除外
        const isSelected = selected.includes(bug.id);
-       html+=`
-<divclass="related-ticket-item${isSelected?'selected':''}"
+       html += `
+<div class="related-ticket-item ${isSelected ? 'selected' : ''}"
      onclick="toggleRelatedTicket('${containerId}','${bug.id}')">
-  <spanclass="related-ticket-checkbox"></span>
-  <span>No.${bug.bugNo}-${escapeHtml(bug.title)}</span>
+  <span class="related-ticket-checkbox"></span>
+  <span>No.${bug.bugNo} - ${escapeHtml(bug.title)}</span>
 </div>`;
      });
    }
