@@ -1,1131 +1,1131 @@
-<!doctype html>
-<html lang="ja">
+<!doctypehtml>
+<htmllang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<metacharset="utf-8"/>
+<metaname="viewport"content="width=device-width,initial-scale=1"/>
 <title>L.O.T.U.S</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪷</text></svg>">
+<linkrel="icon"href="data:image/svg+xml,<svgxmlns='http://www.w3.org/2000/svg'viewBox='00100100'><texty='.9em'font-size='90'>🪷</text></svg>">
 <style>
-    body { background:#0f1724; color:#fff; font-family:sans-serif; margin:0; padding:20px; }
-    section { display:none; }
-    .active { display:block; }
-    input, textarea, select {
-      background:#1d2738; border:1px solid #2c3a52; color:#fff; padding:8px;
-      border-radius:8px; margin-bottom:12px; box-sizing:border-box;
-    }
-    select option { color:#000; background:#fff; }
-    .login-box input {
-      background:#3a4a5f;
-      border:1px solid #4a5a6f;
-    }
-    .table-wrap { overflow:auto; }
-    table { width:100%; border-collapse:collapse; margin-top:16px; table-layout:fixed; }
-    th, td {
-      border-bottom:1px solid #2a3548; padding:12px 8px; vertical-align:middle;
-      color:#e2e8f0; overflow:hidden; text-overflow:ellipsis;
-    }
-    th:nth-child(1), td:nth-child(1) { width:80px; }
-    th:nth-child(2), td:nth-child(2) {
-      width:600px;
-      white-space:normal;
-      word-break:break-word;
-    }
-    th:nth-child(3), td:nth-child(3) { width:150px; }
-    th:nth-child(4), td:nth-child(4) { width:150px; }
-    th:nth-child(5), td:nth-child(5) { width:120px; text-align:center; }
-    tr:hover { background:#1a2536; }
-    .btn { padding:8px 12px; background:#1e90ff; color:#fff; border:none; border-radius:6px; cursor:pointer; }
-    #new, #detail-content { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-    input, textarea { width: 100%; }
-    #new input, #new textarea, #new select { display:block; width:100%; margin-bottom:12px; }
-    select.short-select { width:auto; min-width:120px; max-width:200px; display:inline-block; }
-    #new label { display:block; margin-top:8px; margin-bottom:4px; }
-    .empty-row td { text-align:center; color:#9aa4b2; white-space:normal; }
-    .detail-wrap { display:flex; gap:20px; align-items:flex-start; max-width:1400px; margin: 0 auto; }
-    #detail-main { flex:1; }
-    #detail-content label{display:block;margin-top:10px;font-weight:bold;}
-    #detail-content input,#detail-content textarea,#detail-content select{ width:100%; box-sizing:border-box; margin-top:4px; }
-    .comment-section { margin-top:24px; max-width:800px; margin-left:auto; margin-right:auto; }
-    .comment-list { margin-top:8px; }
-    .comment-item { padding:8px; border-radius:8px; background:rgba(255,255,255,0.02); margin-bottom:8px; display:flex; justify-content:space-between; gap:8px; }
-    .comment-text{ white-space:pre-wrap; color:#e6eef6; }
-    .comment-meta{ font-size:12px; color:#9aa4b2; }
-    .collapsed-latest { font-style:italic; color:#cbd5e1; }
-    #login {
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      position:fixed;
-      top:0;
-      left:0;
-      right:0;
-      bottom:0;
-      padding:20px;
-    }
-    .login-box {
-      background:#1d2738;
-      padding:32px;
-      border-radius:12px;
-      border:1px solid #2c3a52;
-      width:100%;
-      max-width:400px;
-    }
-    .login-box h2 {
-      margin-top:0;
-      text-align:center;
-    }
-    .login-box input {
-      width:100%;
-      margin-bottom:16px;
-    }
-    .login-box .btn {
-      width:100%;
-    }
-    .error-msg {
-      color:#ff6b6b;
-      font-size:14px;
-      margin-top:8px;
-      text-align:center;
-    }
-    #loading {
-      position:fixed;
-      top:0;
-      left:0;
-      right:0;
-      bottom:0;
-      background:rgba(15,23,36,0.9);
-      display:none;
-      justify-content:center;
-      align-items:center;
-      z-index:9999;
-    }
-    #loading.show {
-      display:flex;
-    }
-    .spinner {
-      border:4px solid #2c3a52;
-      border-top:4px solid #1e90ff;
-      border-radius:50%;
-      width:50px;
-      height:50px;
-      animation:spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform:rotate(0deg); }
-      100% { transform:rotate(360deg); }
-    }
-    .required::after {
-      content: ' *';
-      color: #ff6b6b;
-      font-weight: bold;
-    }
-    .bug-link {
-      color: #1e90ff;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .bug-link:hover {
-      text-decoration: underline;
-    }
-    /* 関連チケット選択UI */
-　　.related-tickets-selector {
-  　　border: 1px solid #2c3a52;
-  　　border-radius: 8px;
-  　　padding: 8px;
-  　　max-height: 200px;
-  　　overflow-y: auto;
-  　　background: #1d2738;
-  　　margin-top: 4px;
-　　}
-　　.related-ticket-item {
-  　　padding: 6px 8px;
-  　　margin: 4px 0;
-  　　border-radius: 4px;
-  　　cursor: pointer;
-  　　background: rgba(255,255,255,0.03);
-  　　display: flex;
-  　　align-items: center;
-  　　gap: 8px;
-　　}
-　　.related-ticket-item:hover {
-  　　background: rgba(255,255,255,0.08);
-　　}
-　　.related-ticket-item.selected {
-  　　background: rgba(30,144,255,0.3);
-  　　border: 1px solid #1e90ff;
-　　}
-　　.related-ticket-checkbox {
-  　　width: 16px;
-  　　height: 16px;
-  　　border: 2px solid #2c3a52;
-  　　border-radius: 3px;
-  　　display: inline-block;
-  　　position: relative;
-  　　flex-shrink: 0;
-　　}
-　　.related-ticket-item.selected .related-ticket-checkbox {
-  　　background: #1e90ff;
-  　　border-color: #1e90ff;
-　　}
-　　.related-ticket-item.selected .related-ticket-checkbox::after {
-  　　content: '✓';
-  　　position: absolute;
-  　　top: -2px;
-  　　left: 2px;
-  　　color: white;
-  　　font-size: 12px;
-　　}
-    @media (max-width:900px){ .detail-wrap{ flex-direction:column;} }
-  </style>
+body{background:#0f1724;color:#fff;font-family:sans-serif;margin:0;padding:20px;}
+section{display:none;}
+.active{display:block;}
+input,textarea,select{
+background:#1d2738;border:1pxsolid#2c3a52;color:#fff;padding:8px;
+border-radius:8px;margin-bottom:12px;box-sizing:border-box;
+}
+selectoption{color:#000;background:#fff;}
+.login-boxinput{
+background:#3a4a5f;
+border:1pxsolid#4a5a6f;
+}
+.table-wrap{overflow:auto;}
+table{width:100%;border-collapse:collapse;margin-top:16px;table-layout:fixed;}
+th,td{
+border-bottom:1pxsolid#2a3548;padding:12px8px;vertical-align:middle;
+color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;
+}
+th:nth-child(1),td:nth-child(1){width:80px;}
+th:nth-child(2),td:nth-child(2){
+width:600px;
+white-space:normal;
+word-break:break-word;
+}
+th:nth-child(3),td:nth-child(3){width:150px;}
+th:nth-child(4),td:nth-child(4){width:150px;}
+th:nth-child(5),td:nth-child(5){width:120px;text-align:center;}
+tr:hover{background:#1a2536;}
+.btn{padding:8px12px;background:#1e90ff;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+#new,#detail-content{max-width:800px;margin:0auto;padding:020px;}
+input,textarea{width:100%;}
+#newinput,#newtextarea,#newselect{display:block;width:100%;margin-bottom:12px;}
+select.short-select{width:auto;min-width:120px;max-width:200px;display:inline-block;}
+#newlabel{display:block;margin-top:8px;margin-bottom:4px;}
+.empty-rowtd{text-align:center;color:#9aa4b2;white-space:normal;}
+.detail-wrap{display:flex;gap:20px;align-items:flex-start;max-width:1400px;margin:0auto;}
+#detail-main{flex:1;}
+#detail-contentlabel{display:block;margin-top:10px;font-weight:bold;}
+#detail-contentinput,#detail-contenttextarea,#detail-contentselect{width:100%;box-sizing:border-box;margin-top:4px;}
+.comment-section{margin-top:24px;max-width:800px;margin-left:auto;margin-right:auto;}
+.comment-list{margin-top:8px;}
+.comment-item{padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px;display:flex;justify-content:space-between;gap:8px;}
+.comment-text{white-space:pre-wrap;color:#e6eef6;}
+.comment-meta{font-size:12px;color:#9aa4b2;}
+.collapsed-latest{font-style:italic;color:#cbd5e1;}
+#login{
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+padding:20px;
+}
+.login-box{
+background:#1d2738;
+padding:32px;
+border-radius:12px;
+border:1pxsolid#2c3a52;
+width:100%;
+max-width:400px;
+}
+.login-boxh2{
+margin-top:0;
+text-align:center;
+}
+.login-boxinput{
+width:100%;
+margin-bottom:16px;
+}
+.login-box.btn{
+width:100%;
+}
+.error-msg{
+color:#ff6b6b;
+font-size:14px;
+margin-top:8px;
+text-align:center;
+}
+#loading{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(15,23,36,0.9);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+#loading.show{
+display:flex;
+}
+.spinner{
+border:4pxsolid#2c3a52;
+border-top:4pxsolid#1e90ff;
+border-radius:50%;
+width:50px;
+height:50px;
+animation:spin1slinearinfinite;
+}
+@keyframesspin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+.required::after{
+content:'*';
+color:#ff6b6b;
+font-weight:bold;
+}
+.bug-link{
+color:#1e90ff;
+text-decoration:none;
+cursor:pointer;
+}
+.bug-link:hover{
+text-decoration:underline;
+}
+/*関連チケット選択UI*/
+.related-tickets-selector{
+border:1pxsolid#2c3a52;
+border-radius:8px;
+padding:8px;
+max-height:200px;
+overflow-y:auto;
+background:#1d2738;
+margin-top:4px;
+}
+.related-ticket-item{
+padding:6px8px;
+margin:4px0;
+border-radius:4px;
+cursor:pointer;
+background:rgba(255,255,255,0.03);
+display:flex;
+align-items:center;
+gap:8px;
+}
+.related-ticket-item:hover{
+background:rgba(255,255,255,0.08);
+}
+.related-ticket-item.selected{
+background:rgba(30,144,255,0.3);
+border:1pxsolid#1e90ff;
+}
+.related-ticket-checkbox{
+width:16px;
+height:16px;
+border:2pxsolid#2c3a52;
+border-radius:3px;
+display:inline-block;
+position:relative;
+flex-shrink:0;
+}
+.related-ticket-item.selected.related-ticket-checkbox{
+background:#1e90ff;
+border-color:#1e90ff;
+}
+.related-ticket-item.selected.related-ticket-checkbox::after{
+content:'✓';
+position:absolute;
+top:-2px;
+left:2px;
+color:white;
+font-size:12px;
+}
+@media(max-width:900px){.detail-wrap{flex-direction:column;}}
+</style>
 </head>
 <body>
-  <div id="loading">
-    <div class="spinner"></div>
-  </div>
-  <section id="login">
-    <div class="login-box">
-      <h2>🪷L.O.T.U.S</h2>
-    　<h4>Bug Tracking System</h4>
-        <p>
-            <font size="1">
-                <i>
-                    <b>L</b>ogical 
-                    <b>O</b>rganization of 
-                    <b>T</b>asks and 
-                    <b>U</b>nresolved 
-                    <b>S</b>ituations
-                </i>
-            </font>
-        </p>
-      <input id="login-userId" type="text" placeholder="ユーザーID" />
-      <input id="login-password" type="password" placeholder="パスワード" />
-      <button class="btn" onclick="doLogin()">ログイン</button>
-      <div id="login-error" class="error-msg"></div>
-    </div>
-  </section>
-  <nav id="main-nav" style="display:none;margin-bottom:12px;">
-    <button class="btn" id="nav-list" onclick="go('#list')" style="display:none;">一覧</button>
-    <button class="btn" id="nav-new" onclick="go('#new')">新規登録</button>
-    <button class="btn" onclick="doLogout()" style="margin-left:auto;">ログアウト</button>
-    <span id="user-info" style="line-height:32px;margin-left:8px;color:#9aa4b2;"></span>
-  </nav>
-  <section id="list">
-    <h2>バグ一覧</h2>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-      <input id="search" type="text" placeholder="検索 (タイトル・説明)" style="flex:1;min-width:220px;" onkeyup="renderList()" />
-    </div>
-    <div class="table-wrap">
-      <table id="bugTable">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>タイトル</th>
-            <th>ステータス</th>
-            <th>重要度</th>
-            <th>優先度</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-  <section id="new">
-    <h2>新しいバグを登録</h2>
-    <label for="new-status" class="required">ステータス</label>
-    <select id="new-status" class="short-select" required>
-      <option selected>OPEN(新規)</option>
-      <option>ACCEPT(アサイン済み)</option>
-      <option>RESOLVED(対象方法確定)</option>
-      <option>FIXED(修正済み)</option>
-      <option>CLOSED(解消)</option>
-      <option>INVALID(不具合ではない)</option>
-      <option>WONTFIX(仕様扱い)</option>
-      <option>DUPLICATE(重複している不具合)</option>
-      <option>WORKSFORME(再現しない)</option>
-      <option>LATER(次期バージョンで対応)</option>
-      <option>REMIND(制限事項扱い)</option>
-      <option>REOPENED(再オープン)</option>
-    </select>
-    <label for="new-title" class="required">タイトル</label>
-    <input id="new-title" placeholder="タイトル" required />
-    <label for="new-desc" class="required">説明</label>
-    <textarea id="new-desc" placeholder="不具合の再現手順等を記載してください" rows="6" required></textarea>
-    <label for="new-repro">再現性</label>
-    <input id="new-repro" placeholder="再現性" />
-    <label>起票者</label>
-    <input id="new-reporter" readonly style="background:#0f1724;cursor:not-allowed;" />
-    <label for="new-assignee" class="required">担当者</label>
-    <input id="new-assignee" placeholder="担当者" required />
-    <label for="new-severity" class="required">重要度</label>
-    <select id="new-severity" class="short-select" required>
-      <option value="" selected>選択してください</option>
-      <option>S(致命的)</option>
-      <option>A(機能上問題（回避策なし）)</option>
-      <option>B(機能上問題（回避策あり）)</option>
-      <option>C(商品性上問題)</option>
-      <option>D(軽微)</option>
-    </select>
-    <label for="new-priority" class="required">優先度</label>
-    <select id="new-priority" class="short-select" required>
-      <option value="" selected>選択してください</option>
-      <option>High</option>
-      <option>Medium</option>
-      <option>Low</option>
-    </select>
-    <label for="new-env">テスト環境</label>
-    <input id="new-env" placeholder="テスト環境" />
-    <label for="new-version">バージョン情報</label>
-    <input id="new-version" placeholder="バージョン情報" />
-    <label for="new-related">関連チケット（複数選択可）</label>
-    <div id="new-related-container"></div>
-    <div style="margin-top:8px;display:flex;gap:8px;">
-      <button class="btn" onclick="addBug()">登録</button>
-      <button class="btn" onclick="go('#list')" style="background:#6c757d;">キャンセル</button>
-    </div>
-  </section>
-  <section id="detail">
-    <div class="detail-wrap">
-      <div id="detail-main">
-        <div id="detail-content"></div>
-        <div class="comment-section">
-          <h3 style="margin-top:0;margin-bottom:8px;">コメント</h3>
-          <div id="comment-controls" style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
-            <button class="btn" id="toggle-comments-btn" onclick="toggleComments(currentDetailId)">展開/折畳</button>
-            <div style="flex:1;text-align:right;color:#9aa4b2;font-size:12px;">新しい順</div>
-          </div>
-          <div id="comment-collapsed" class="collapsed-latest" style="display:none;padding:8px;">コメントがありません</div>
-          <div id="comment-list" class="comment-list" style="display:none;max-height:360px;overflow:auto;"></div>
-          <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.03);padding-top:8px;">
-            <textarea id="comment-input" rows="3" placeholder="コメントを入力"></textarea>
-            <div style="display:flex;gap:8px;margin-top:6px;">
-              <button class="btn" onclick="addComment(currentDetailId)">コメント追加</button>
-            </div>
-          </div>
-        </div>
-        <h3 style="margin-top:24px; max-width:800px; margin-left:auto; margin-right:auto;">変更履歴</h3>
-        <div id="detail-history" style="font-size:13px; color:#cbd5e1; background:rgba(255,255,255,0.03); padding:8px; border-radius:8px; max-height:200px; overflow:auto; max-width:800px; margin-left:auto; margin-right:auto;"></div>
-      </div>
-    </div>
-  </section>
+<divid="loading">
+<divclass="spinner"></div>
+</div>
+<sectionid="login">
+<divclass="login-box">
+<h2>🪷L.O.T.U.S</h2>
+<h4>BugTrackingSystem</h4>
+<p>
+<fontsize="1">
+<i>
+<b>L</b>ogical
+<b>O</b>rganizationof
+<b>T</b>asksand
+<b>U</b>nresolved
+<b>S</b>ituations
+</i>
+</font>
+</p>
+<inputid="login-userId"type="text"placeholder="ユーザーID"/>
+<inputid="login-password"type="password"placeholder="パスワード"/>
+<buttonclass="btn"onclick="doLogin()">ログイン</button>
+<divid="login-error"class="error-msg"></div>
+</div>
+</section>
+<navid="main-nav"style="display:none;margin-bottom:12px;">
+<buttonclass="btn"id="nav-list"onclick="go('#list')"style="display:none;">一覧</button>
+<buttonclass="btn"id="nav-new"onclick="go('#new')">新規登録</button>
+<buttonclass="btn"onclick="doLogout()"style="margin-left:auto;">ログアウト</button>
+<spanid="user-info"style="line-height:32px;margin-left:8px;color:#9aa4b2;"></span>
+</nav>
+<sectionid="list">
+<h2>バグ一覧</h2>
+<divstyle="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+<inputid="search"type="text"placeholder="検索(タイトル・説明)"style="flex:1;min-width:220px;"onkeyup="renderList()"/>
+</div>
+<divclass="table-wrap">
+<tableid="bugTable">
+<thead>
+<tr>
+<th>No.</th>
+<th>タイトル</th>
+<th>ステータス</th>
+<th>重要度</th>
+<th>優先度</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</section>
+<sectionid="new">
+<h2>新しいバグを登録</h2>
+<labelfor="new-status"class="required">ステータス</label>
+<selectid="new-status"class="short-select"required>
+<optionselected>OPEN(新規)</option>
+<option>ACCEPT(アサイン済み)</option>
+<option>RESOLVED(対象方法確定)</option>
+<option>FIXED(修正済み)</option>
+<option>CLOSED(解消)</option>
+<option>INVALID(不具合ではない)</option>
+<option>WONTFIX(仕様扱い)</option>
+<option>DUPLICATE(重複している不具合)</option>
+<option>WORKSFORME(再現しない)</option>
+<option>LATER(次期バージョンで対応)</option>
+<option>REMIND(制限事項扱い)</option>
+<option>REOPENED(再オープン)</option>
+</select>
+<labelfor="new-title"class="required">タイトル</label>
+<inputid="new-title"placeholder="タイトル"required/>
+<labelfor="new-desc"class="required">説明</label>
+<textareaid="new-desc"placeholder="不具合の再現手順等を記載してください"rows="6"required></textarea>
+<labelfor="new-repro">再現性</label>
+<inputid="new-repro"placeholder="再現性"/>
+<label>起票者</label>
+<inputid="new-reporter"readonlystyle="background:#0f1724;cursor:not-allowed;"/>
+<labelfor="new-assignee"class="required">担当者</label>
+<inputid="new-assignee"placeholder="担当者"required/>
+<labelfor="new-severity"class="required">重要度</label>
+<selectid="new-severity"class="short-select"required>
+<optionvalue=""selected>選択してください</option>
+<option>S(致命的)</option>
+<option>A(機能上問題（回避策なし）)</option>
+<option>B(機能上問題（回避策あり）)</option>
+<option>C(商品性上問題)</option>
+<option>D(軽微)</option>
+</select>
+<labelfor="new-priority"class="required">優先度</label>
+<selectid="new-priority"class="short-select"required>
+<optionvalue=""selected>選択してください</option>
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+<labelfor="new-env">テスト環境</label>
+<inputid="new-env"placeholder="テスト環境"/>
+<labelfor="new-version">バージョン情報</label>
+<inputid="new-version"placeholder="バージョン情報"/>
+<labelfor="new-related">関連チケット（複数選択可）</label>
+<divid="new-related-container"></div>
+<divstyle="margin-top:8px;display:flex;gap:8px;">
+<buttonclass="btn"onclick="addBug()">登録</button>
+<buttonclass="btn"onclick="go('#list')"style="background:#6c757d;">キャンセル</button>
+</div>
+</section>
+<sectionid="detail">
+<divclass="detail-wrap">
+<divid="detail-main">
+<divid="detail-content"></div>
+<divclass="comment-section">
+<h3style="margin-top:0;margin-bottom:8px;">コメント</h3>
+<divid="comment-controls"style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+<buttonclass="btn"id="toggle-comments-btn"onclick="toggleComments(currentDetailId)">展開/折畳</button>
+<divstyle="flex:1;text-align:right;color:#9aa4b2;font-size:12px;">新しい順</div>
+</div>
+<divid="comment-collapsed"class="collapsed-latest"style="display:none;padding:8px;">コメントがありません</div>
+<divid="comment-list"class="comment-list"style="display:none;max-height:360px;overflow:auto;"></div>
+<divstyle="margin-top:8px;border-top:1pxsolidrgba(255,255,255,0.03);padding-top:8px;">
+<textareaid="comment-input"rows="3"placeholder="コメントを入力"></textarea>
+<divstyle="display:flex;gap:8px;margin-top:6px;">
+<buttonclass="btn"onclick="addComment(currentDetailId)">コメント追加</button>
+</div>
+</div>
+</div>
+<h3style="margin-top:24px;max-width:800px;margin-left:auto;margin-right:auto;">変更履歴</h3>
+<divid="detail-history"style="font-size:13px;color:#cbd5e1;background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;max-height:200px;overflow:auto;max-width:800px;margin-left:auto;margin-right:auto;"></div>
+</div>
+</div>
+</section>
 <script>
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzJSt3uXYr2Dmtv-SyIwEhmEj40Rk8GkZLBJCWF1uHs1jERqbJ6fiSzZNNPhxTePHkM/exec';
-  function callGAS(action, payload) {
-    return fetch(GAS_ENDPOINT, {
-      method: 'POST',
-      body: JSON.stringify({ action, payload })
-    }).then(r => r.json());
-  }
-  let currentUser = null;
-  let bugsCache = [];
-  let currentDetailId = null;
-  let commentsExpanded = {};
-  let isEditMode = false;
-　let navigationHistory = []; 
-  function canEditDevFields() {
-    if (!currentUser) return false;
-    return currentUser.userType === 'admin';
-  }
-  function canEditBug(bug) {
-    if (!currentUser) return false;
-    if (currentUser.userType === 'admin') return true;
-    if (currentUser.userType === 'group') return true;
-    if (currentUser.userType === 'general') {
-      return bug.reporter === currentUser.userId;
-    }
-    return false;
-  }
-  function showLoading() {
-    document.getElementById('loading').classList.add('show');
-  }
-  function hideLoading() {
-    document.getElementById('loading').classList.remove('show');
-  }
-  function doLogin() {
-    const userId = document.getElementById('login-userId').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    const errorEl = document.getElementById('login-error');
-    if (!userId || !password) {
-      errorEl.textContent = 'ユーザーIDとパスワードを入力してください';
-      return;
-    }
-    showLoading();
-    errorEl.textContent = '';
-    callGAS('authenticate', { userId, password })
-      .then(result => {
-        hideLoading();
-        if (!result.success) {
-          errorEl.textContent = result.message || 'ログインに失敗しました';
-          return;
-        }
-        currentUser = {
-          userId: result.userId,
-          userName: result.userName,
-          userType: result.userType
-        };
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('main-nav').style.display = 'flex';
-        let userTypeLabel = '';
-        if (result.userType === 'admin') {
-          userTypeLabel = '管理者';
-        } else if (result.userType === 'group') {
-          userTypeLabel = 'グループ';
-        } else {
-          userTypeLabel = '一般';
-        }
-        document.getElementById('user-info').textContent = `${result.userName} (${userTypeLabel})`;
-        loadBugsFromServer();
-      })
-      .catch(e => {
-        hideLoading();
-        errorEl.textContent = '通信エラー: ' + e.message;
-      });
-  }
-  function doLogout() {
-    currentUser = null;
-    bugsCache = [];
-    location.hash = '';
-    location.reload();
-  }
-  function loadBugsFromServer() {
-    if (!currentUser) return;
-    showLoading();
-    callGAS('getBugs', {
-      userId: currentUser.userId,
-      userType: currentUser.userType
-    })
-      .then(result => {
-        hideLoading();
-        if (!result.success) {
-          alert(result.message || '読み込み失敗');
-          return;
-        }
-        bugsCache = result.bugs || [];
-        go('#list');
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-          renderList();
-        }, 100);
-      })
-      .catch(e => {
-        hideLoading();
-        alert('通信エラー: ' + e.message);
-      });
-  }
-  function go(hash) { 
-    location.hash = hash;
-    window.scrollTo(0, 0);
-  }
-  function clearNewForm() {
-    const ids = ['new-title', 'new-desc', 'new-env', 'new-version', 'new-repro', 'new-assignee'];
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-    const reporterEl = document.getElementById('new-reporter');
-    if (reporterEl && currentUser) {
-      reporterEl.value = currentUser.userName;
-    }
-    const status = document.getElementById('new-status');
-    if (status) status.value = 'OPEN(新規)';
-    const priority = document.getElementById('new-priority');
-    if (priority) priority.value = '';
-    const severity = document.getElementById('new-severity');
-    if (severity) severity.value = '';
-    populateRelatedTickets('new-related-container', null, []);
-  }
-　function populateRelatedTickets(containerId, currentBugId, selectedIds) {
-   const container = document.getElementById(containerId);
-   if (!container) return;
-   const selected = selectedIds || [];
-   let html = '<div class="related-tickets-selector">';
-   if (bugsCache.length === 0) {
-     html += '<div style="padding:8px;color:#9aa4b2;">関連付け可能なチケットがありません</div>';
-   } else {
-     bugsCache.forEach(bug => {
-       if (bug.id === currentBugId) return; // 自分自身は除外
-       const isSelected = selected.includes(bug.id);
-       html += `
-         <div class="related-ticket-item ${isSelected ? 'selected' : ''}" 
-              onclick="toggleRelatedTicket('${containerId}', '${bug.id}')">
-           <span class="related-ticket-checkbox"></span>
-           <span>No.${bug.bugNo} - ${escapeHtml(bug.title)}</span>
-         </div>`;
-     });
-   }
-   html += '</div>';
-   container.innerHTML = html;
- }
-
-function toggleRelatedTicket(containerId, bugId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  
-  const items = container.querySelectorAll('.related-ticket-item');
-  items.forEach(item => {
-    if (item.textContent.includes(bugId) || item.getAttribute('onclick').includes(bugId)) {
-      item.classList.toggle('selected');
-    }
-  });
+constGAS_ENDPOINT='https://script.google.com/macros/s/AKfycbzJSt3uXYr2Dmtv-SyIwEhmEj40Rk8GkZLBJCWF1uHs1jERqbJ6fiSzZNNPhxTePHkM/exec';
+functioncallGAS(action,payload){
+returnfetch(GAS_ENDPOINT,{
+method:'POST',
+body:JSON.stringify({action,payload})
+}).then(r=>r.json());
+}
+letcurrentUser=null;
+letbugsCache=[];
+letcurrentDetailId=null;
+letcommentsExpanded={};
+letisEditMode=false;
+letnavigationHistory=[];
+functioncanEditDevFields(){
+if(!currentUser)returnfalse;
+returncurrentUser.userType==='admin';
+}
+functioncanEditBug(bug){
+if(!currentUser)returnfalse;
+if(currentUser.userType==='admin')returntrue;
+if(currentUser.userType==='group')returntrue;
+if(currentUser.userType==='general'){
+returnbug.reporter===currentUser.userId;
+}
+returnfalse;
+}
+functionshowLoading(){
+document.getElementById('loading').classList.add('show');
+}
+functionhideLoading(){
+document.getElementById('loading').classList.remove('show');
+}
+functiondoLogin(){
+constuserId=document.getElementById('login-userId').value.trim();
+constpassword=document.getElementById('login-password').value.trim();
+consterrorEl=document.getElementById('login-error');
+if(!userId||!password){
+errorEl.textContent='ユーザーIDとパスワードを入力してください';
+return;
+}
+showLoading();
+errorEl.textContent='';
+callGAS('authenticate',{userId,password})
+.then(result=>{
+hideLoading();
+if(!result.success){
+errorEl.textContent=result.message||'ログインに失敗しました';
+return;
+}
+currentUser={
+userId:result.userId,
+userName:result.userName,
+userType:result.userType
+};
+document.getElementById('login').style.display='none';
+document.getElementById('main-nav').style.display='flex';
+letuserTypeLabel='';
+if(result.userType==='admin'){
+userTypeLabel='管理者';
+}elseif(result.userType==='group'){
+userTypeLabel='グループ';
+}else{
+userTypeLabel='一般';
+}
+document.getElementById('user-info').textContent=`${result.userName}(${userTypeLabel})`;
+loadBugsFromServer();
+})
+.catch(e=>{
+hideLoading();
+errorEl.textContent='通信エラー:'+e.message;
+});
+}
+functiondoLogout(){
+currentUser=null;
+bugsCache=[];
+location.hash='';
+location.reload();
+}
+functionloadBugsFromServer(){
+if(!currentUser)return;
+showLoading();
+callGAS('getBugs',{
+userId:currentUser.userId,
+userType:currentUser.userType
+})
+.then(result=>{
+hideLoading();
+if(!result.success){
+alert(result.message||'読み込み失敗');
+return;
+}
+bugsCache=result.bugs||[];
+go('#list');
+setTimeout(()=>{
+window.scrollTo(0,0);
+renderList();
+},100);
+})
+.catch(e=>{
+hideLoading();
+alert('通信エラー:'+e.message);
+});
+}
+functiongo(hash){
+location.hash=hash;
+window.scrollTo(0,0);
+}
+functionclearNewForm(){
+constids=['new-title','new-desc','new-env','new-version','new-repro','new-assignee'];
+ids.forEach(id=>{
+constel=document.getElementById(id);
+if(el)el.value='';
+});
+constreporterEl=document.getElementById('new-reporter');
+if(reporterEl&&currentUser){
+reporterEl.value=currentUser.userName;
+}
+conststatus=document.getElementById('new-status');
+if(status)status.value='OPEN(新規)';
+constpriority=document.getElementById('new-priority');
+if(priority)priority.value='';
+constseverity=document.getElementById('new-severity');
+if(severity)severity.value='';
+populateRelatedTickets('new-related-container',null,[]);
+}
+functionpopulateRelatedTickets(containerId,currentBugId,selectedIds){
+constcontainer=document.getElementById(containerId);
+if(!container)return;
+constselected=selectedIds||[];
+lethtml='<divclass="related-tickets-selector">';
+if(bugsCache.length===0){
+html+='<divstyle="padding:8px;color:#9aa4b2;">関連付け可能なチケットがありません</div>';
+}else{
+bugsCache.forEach(bug=>{
+if(bug.id===currentBugId)return;//自分自身は除外
+constisSelected=selected.includes(bug.id);
+html+=`
+<divclass="related-ticket-item${isSelected?'selected':''}"
+onclick="toggleRelatedTicket('${containerId}','${bug.id}')">
+<spanclass="related-ticket-checkbox"></span>
+<span>No.${bug.bugNo}-${escapeHtml(bug.title)}</span>
+</div>`;
+});
+}
+html+='</div>';
+container.innerHTML=html;
 }
 
-function getSelectedRelatedTickets(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return [];
-  
-  const selectedIds = [];
-  const items = container.querySelectorAll('.related-ticket-item.selected');
-  
-  items.forEach(item => {
-    const onclick = item.getAttribute('onclick');
-    const match = onclick.match(/'([^']+)'\)$/);
-    if (match && match[1]) {
-      selectedIds.push(match[1]);
-    }
-  });
-  
-  return selectedIds;
-}
-  function route() {
-    window.scrollTo(0, 0);
-    if (!window.__booted) {
-      window.__booted = true;
-      document.getElementById('login').style.display = 'flex';
-      document.getElementById('login').classList.add('active');
-      return;
-    }
-    const hash = location.hash || '#list';
-    const clean = hash.split('/')[0];
-    if (!currentUser && clean !== '#login') {
-      location.hash = '';
-      return;
-    }
-    document.querySelectorAll('section').forEach(s => {
-      s.classList.remove('active');
-      s.style.display = 'none';
-    });
-    const pg = document.querySelector(clean);
-    if (pg) {
-      pg.classList.add('active');
-      pg.style.display = 'block';
-    }
-    const navNew = document.getElementById('nav-new');
-    if (navNew) {
-      navNew.style.display = (clean === '#new' || clean === '#detail') ? 'none' : 'inline-block';
-    }
-    if (clean === '#new') {
-      clearNewForm();
-    }
-    if (clean === '#list') {
-      renderList();
-    }
-    if (clean === '#detail' && hash.includes('/')) {
-      const bugId = hash.split('/')[1];
-      showDetail(bugId);
-    }
-  }
-  window.addEventListener('hashchange', route);
-  window.addEventListener('load', route);
-  function renderList() {
-    const searchInput = document.getElementById('search');
-    const search = searchInput ? searchInput.value.toLowerCase() : '';
-    const tbody = document.querySelector('#bugTable tbody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    const sorted = bugsCache.slice().sort((a, b) => (a.bugNo || 0) - (b.bugNo || 0));
-    const filtered = sorted.filter(b => {
-      if (!search) return true;
-      const searchFields = [
-        b.title || '',
-        b.description || '',
-        b.status || '',
-        b.severity || '',
-        b.priority || '',
-        b.assignee || '',
-        b.reporterName || ''
-      ].join(' ').toLowerCase();
-      return searchFields.includes(search);
-    });
-    if (filtered.length === 0) {
-      const tr = document.createElement('tr');
-      tr.className = 'empty-row';
-      tr.innerHTML = '<td colspan="5">表示する項目がありません</td>';
-      tbody.appendChild(tr);
-      return;
-    }
-    filtered.forEach((b) => {
-      const tr = document.createElement('tr');
-      tr.style.cursor = 'pointer';
-      tr.innerHTML = `
-        <td>No.${b.bugNo || '-'}</td>
-        <td>${escapeHtml(b.title || '')}</td>
-        <td>${escapeHtml(b.status || '')}</td>
-        <td>${escapeHtml(b.severity || '')}</td>
-        <td>${escapeHtml(b.priority || '')}</td>`;
-      tr.addEventListener('click', () => { 
-        go(`#detail/${b.id}`); 
-      });
-      tbody.appendChild(tr);
-    });
-  }
-  function escapeHtml(s) {
-    return (s || '').replace(/[&<>"']/g, c =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-    );
-  }
-  function goToRelatedBug(bugId) {
-    go(`#detail/${bugId}`);
-  }
+functiontoggleRelatedTicket(containerId,bugId){
+constcontainer=document.getElementById(containerId);
+if(!container)return;
 
-  function goBackToPrevious() {
-    // 履歴から現在のページを削除
-    navigationHistory.pop();
-  
-    if (navigationHistory.length > 0) {
-      // 前のページに戻る
-      const previousBugId = navigationHistory[navigationHistory.length - 1];
-      go(`#detail/${previousBugId}`);
-      // showDetailが再度呼ばれるので、履歴重複を防ぐため最後の要素を削除
-      navigationHistory.pop();
-    } else {
-      // 履歴がない場合は一覧に戻る
-      go('#list');
-    }
-  }
-  function addBug() {
-   if (!currentUser) {
-     alert('ログインしてください');
-     return;
-   }
-   const status = document.getElementById('new-status').value;
-   const title = document.getElementById('new-title').value.trim();
-   const description = document.getElementById('new-desc').value.trim();
-   const assignee = document.getElementById('new-assignee').value.trim();
-   const severity = document.getElementById('new-severity').value;
-   const priority = document.getElementById('new-priority').value;
-   if (!status) {
-     alert('ステータスを選択してください');
-     return;
-   }
-   if (!title) {
-     alert('タイトルを入力してください');
-     return;
-   }
-   if (!description) {
-     alert('説明を入力してください');
-     return;
-   }
-   if (!assignee) {
-     alert('担当者を入力してください');
-     return;
-   }
-   if (!severity) {
-     alert('重要度を選択してください');
-     return;
-   }
-   if (!priority) {
-     alert('優先度を選択してください');
-     return;
-   }
-  
-   const selectedRelated = getSelectedRelatedTickets('new-related-container');
-   const relatedId = selectedRelated.join(',');
-  
-   const b = {
-     id: 'b_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now(),
-     bugNo: 0,
-     status: status,
-     title: title,
-     description: description,
-     reproducibility: document.getElementById('new-repro').value,
-     reporter: currentUser.userId,
-     reporterName: currentUser.userName,
-     assignee: assignee,
-     severity: severity,
-     priority: priority,
-     environment: document.getElementById('new-env').value,
-     version: document.getElementById('new-version').value,
-     relatedTicket: relatedId,
-     cause: '',
-     fixPlan: '',
-     impact: '',
-     note: '',
-     comments: [],
-     history: [{ 
-       type: 'create', 
-       at: new Date().toISOString(), 
-       user: currentUser.userName,
-       data: {} 
-     }],
-     createdAt: new Date().toISOString()
-   };
-   showLoading();
-   callGAS('saveBug', { bug: b, userId: currentUser.userId })
-     .then(r => {
-       hideLoading();
-       if (!r.success) {
-         alert(r.message || '保存に失敗しました');
-         return;
-       }
-       alert('登録しました');
-       loadBugsFromServer();
-     })
-     .catch(e => {
-       hideLoading();
-       alert('エラーが発生しました: ' + e.message);
-     });
- }
-  function showDetail(id, fromHistory) {
-   const b = bugsCache.find(x => x.id === id);
-   currentDetailId = id;
-   isEditMode = false;
-   const area = document.getElementById('detail-content');
-   if (!b) {
-     area.innerHTML = '<p>見つかりません</p>';
-     return;
-   }
-  // 履歴管理（ブラウザの戻るボタンから来た場合は追加しない）
-   if (!fromHistory) {
-     navigationHistory.push(id);
-   }
-   b.comments = b.comments || [];
-   b.history = b.history || [];
-   renderDetailContent(b, false);
-   renderHistory(b);
-   renderComments(b);
-   const commentInput = document.getElementById('comment-input');
-   if (commentInput) commentInput.value = '';
- }
-  function renderDetailContent(b, editMode) {
-   const area = document.getElementById('detail-content');
-   const canEdit = canEditBug(b);
-   const canEditDev = canEditDevFields();
-   if (editMode && !canEdit) {
-     editMode = false;
-   }
-   const disabled = editMode ? '' : 'disabled';
-   const readonlyStyle = editMode ? '' : 'background:#0f1724;cursor:not-allowed;';
-   const devDisabled = (editMode && canEditDev) ? '' : 'disabled';
-   const devReadonlyStyle = (editMode && canEditDev) ? '' : 'background:#0f1724;cursor:not-allowed;';
-  
-   let relatedHtml = '';
-   if (editMode) {
-     relatedHtml = '<div id="detail-related-container"></div>';
-   } else {
-     if (b.relatedTicket) {
-       const relatedIds = b.relatedTicket.split(',').filter(x => x);
-       if (relatedIds.length > 0) {
-         relatedHtml = '<div style="margin-top:4px;">';
-         relatedIds.forEach(relId => {
-           const relatedBug = bugsCache.find(x => x.id === relId);
-           if (relatedBug) {
-             relatedHtml += `<div><a href="javascript:void(0)" onclick="goToRelatedBug('${relatedBug.id}')" class="bug-link">No.${relatedBug.bugNo} - ${escapeHtml(relatedBug.title)}</a></div>`;
-           }
-         });
-         relatedHtml += '</div>';
-       } else {
-         relatedHtml = '<div style="margin-top:4px;">なし</div>';
-       }
-     } else {
-       relatedHtml = '<div style="margin-top:4px;">なし</div>';
-     }
-   }
-  
-   area.innerHTML = `
-     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-       <h2 style="margin:0;">バグ詳細 (No.${b.bugNo || '-'})</h2>
-       <div style="display:flex; gap:8px;">
-         ${canEdit ? 
-           (editMode ? 
-             `<button class="btn" onclick="saveDetail('${b.id}')">保存</button>
-              <button class="btn" onclick="cancelEdit('${b.id}')">キャンセル</button>` :
-             `<button class="btn" onclick="toggleEditMode('${b.id}')">編集</button>
-              <button class="btn" onclick="goBackToPrevious()">戻る</button>`
-           ) :
-           `<button class="btn" onclick="goBackToPrevious()">戻る</button>`
-         }
-       </div>
-     </div>
-     <label class="required">ステータス</label>
-     <select id="detail-status" style="width:260px;${readonlyStyle}" ${disabled}>
-       <option ${b.status === 'OPEN(新規)' ? 'selected' : ''}>OPEN(新規)</option>
-       <option ${b.status === 'ACCEPT(アサイン済み)' ? 'selected' : ''}>ACCEPT(アサイン済み)</option>
-       <option ${b.status === 'RESOLVED(対象方法確定)' ? 'selected' : ''}>RESOLVED(対象方法確定)</option>
-       <option ${b.status === 'FIXED(修正済み)' ? 'selected' : ''}>FIXED(修正済み)</option>
-       <option ${b.status === 'CLOSED(解消)' ? 'selected' : ''}>CLOSED(解消)</option>
-       <option ${b.status === 'INVALID(不具合ではない)' ? 'selected' : ''}>INVALID(不具合ではない)</option>
-       <option ${b.status === 'WONTFIX(仕様扱い)' ? 'selected' : ''}>WONTFIX(仕様扱い)</option>
-       <option ${b.status === 'DUPLICATE(重複している不具合)' ? 'selected' : ''}>DUPLICATE(重複している不具合)</option>
-       <option ${b.status === 'WORKSFORME(再現しない)' ? 'selected' : ''}>WORKSFORME(再現しない)</option>
-       <option ${b.status === 'LATER(次期バージョンで対応)' ? 'selected' : ''}>LATER(次期バージョンで対応)</option>
-       <option ${b.status === 'REMIND(制限事項扱い)' ? 'selected' : ''}>REMIND(制限事項扱い)</option>
-       <option ${b.status === 'REOPENED(再オープン)' ? 'selected' : ''}>REOPENED(再オープン)</option>
-     </select>
-     <label class="required">タイトル</label>
-     <input id="detail-title" value="${escapeHtml(b.title || '')}" ${disabled} style="${readonlyStyle}" />
-     <label class="required">説明</label>
-     <textarea id="detail-desc" rows="6" ${disabled} style="${readonlyStyle}">${escapeHtml(b.description || '')}</textarea>
-     <label>再現性</label>
-     <input id="detail-repro" value="${escapeHtml(b.reproducibility || '')}" ${disabled} style="${readonlyStyle}" />
-     <label>起票者</label>
-     <input id="detail-reporter" value="${escapeHtml(b.reporterName || b.reporter || '')}" readonly style="background:#0f1724;cursor:not-allowed;" />
-     <label class="required">担当者</label>
-     <input id="detail-assignee" value="${escapeHtml(b.assignee || '')}" ${disabled} style="${readonlyStyle}" />
-     <label class="required">重要度</label>
-     <select id="detail-severity" style="width:200px;${readonlyStyle}" ${disabled}>
-       <option value="">選択してください</option>
-       <option value="S(致命的)" ${b.severity === 'S(致命的)' ? 'selected' : ''}>S(致命的)</option>
-       <option value="A(機能上問題（回避策なし）)" ${b.severity === 'A(機能上問題（回避策なし）)' ? 'selected' : ''}>A(機能上問題（回避策なし）)</option>
-       <option value="B(機能上問題（回避策あり）)" ${b.severity === 'B(機能上問題（回避策あり）)' ? 'selected' : ''}>B(機能上問題（回避策あり）)</option>
-       <option value="C(商品性上問題)" ${b.severity === 'C(商品性上問題)' ? 'selected' : ''}>C(商品性上問題)</option>
-       <option value="D(軽微)" ${b.severity === 'D(軽微)' ? 'selected' : ''}>D(軽微)</option>
-     </select>
-     <label class="required">優先度</label>
-     <select id="detail-priority" style="width:120px;${readonlyStyle}" ${disabled}>
-       <option value="">選択してください</option>
-       <option value="High" ${b.priority === 'High' ? 'selected' : ''}>High</option>
-       <option value="Medium" ${b.priority === 'Medium' ? 'selected' : ''}>Medium</option>
-       <option value="Low" ${b.priority === 'Low' ? 'selected' : ''}>Low</option>
-     </select>
-     <label>テスト環境</label>
-     <input id="detail-env" value="${escapeHtml(b.environment || '')}" ${disabled} style="${readonlyStyle}" />
-     <label>バージョン情報</label>
-     <input id="detail-version" value="${escapeHtml(b.version || '')}" ${disabled} style="${readonlyStyle}" />
-     <label>関連チケット（複数選択可）</label>
-     ${relatedHtml}
-     <label>不具合原因（開発者記入）</label>
-     <textarea id="detail-cause" rows="4" ${devDisabled} style="${devReadonlyStyle}">${escapeHtml(b.cause || '')}</textarea>
-     <label>修正方針・内容（開発者記入）</label>
-     <textarea id="detail-fixplan" rows="4" ${devDisabled} style="${devReadonlyStyle}">${escapeHtml(b.fixPlan || '')}</textarea>
-     <label>影響範囲（開発者記入）</label>
-     <textarea id="detail-impact" rows="4" ${devDisabled} style="${devReadonlyStyle}">${escapeHtml(b.impact || '')}</textarea>
-     <label>備考（開発者記入）</label>
-     <textarea id="detail-note" rows="4" ${devDisabled} style="${devReadonlyStyle}">${escapeHtml(b.note || '')}</textarea>
-   `;
-  
-   // 編集モードの場合、関連チケット選択UIを表示
-   if (editMode) {
-     const relatedIds = (b.relatedTicket || '').split(',').filter(x => x);
-     populateRelatedTickets('detail-related-container', b.id, relatedIds);
-   }
- }
-  function toggleEditMode(id) {
-    const b = bugsCache.find(x => x.id === id);
-    if (!b) return;
-    if (!canEditBug(b)) {
-      alert('このバグを編集する権限がありません');
-      return;
-    }
-    isEditMode = true;
-    renderDetailContent(b, true);
-    renderHistory(b);
-  }
-  function cancelEdit(id) {
-    const b = bugsCache.find(x => x.id === id);
-    if (!b) return;
-    isEditMode = false;
-    renderDetailContent(b, false);
-    renderHistory(b);
-  }
-  function saveDetail(id) {
-    if (!currentUser) {
-      alert('ログインしてください');
-      return;
-    }
-    const b = bugsCache.find(x => x.id === id);
-    if (!b) {
-      alert('対象データが見つかりません');
-      return;
-    }
-    if (!canEditBug(b)) {
-      alert('このバグを編集する権限がありません');
-      return;
-    }
-    const v = (id) => {
-      const el = document.getElementById(id);
-      return el ? el.value.trim() : '';
-    };
-    const status = v('detail-status');
-    const title = v('detail-title');
-    const description = v('detail-desc');
-    const assignee = v('detail-assignee');
-    const severity = v('detail-severity');
-    const priority = v('detail-priority');
-    if (!status) {
-      alert('ステータスを選択してください');
-      return;
-    }
-    if (!title) {
-      alert('タイトルを入力してください');
-      return;
-    }
-    if (!description) {
-      alert('説明を入力してください');
-      return;
-    }
-    if (!assignee) {
-      alert('担当者を入力してください');
-      return;
-    }
-    if (!severity) {
-      alert('重要度を選択してください');
-      return;
-    }
-    if (!priority) {
-      alert('優先度を選択してください');
-      return;
-    }
-    const before = JSON.parse(JSON.stringify(b));
-    b.status = status;
-    b.title = title;
-    b.description = description;
-    b.reproducibility = v('detail-repro');
-    b.assignee = assignee;
-    b.severity = severity;
-    b.priority = priority;
-    b.environment = v('detail-env');
-    b.version = v('detail-version');
-  
-    const selectedRelated = getSelectedRelatedTickets('detail-related-container');
-    b.relatedTicket = selectedRelated.join(',');
-    
-    if (canEditDevFields()) {
-      b.cause = v('detail-cause');
-      b.fixPlan = v('detail-fixplan');
-      b.impact = v('detail-impact');
-      b.note = v('detail-note');
-    }
-    const changes = [];
-    const FIELD_LABELS = {
-      status: 'ステータス',
-      title: 'タイトル',
-      description: '説明',
-      reproducibility: '再現性',
-      severity: '重要度',
-      priority: '優先度',
-      assignee: '担当者',
-      environment: 'テスト環境',
-      version: 'バージョン情報',
-      relatedTicket: '関連チケット',
-      cause: '不具合原因',
-      fixPlan: '修正方針・内容',
-      impact: '影響範囲',
-      note: '備考'
-    };
-    Object.keys(FIELD_LABELS).forEach(k => {
-      if (typeof b[k] === 'string' && before[k] !== b[k]) {
-        let fromValue = before[k] || '';
-        let toValue = b[k] || '';
-      
-        // 関連チケットの場合、IDをタイトルに変換
-        if (k === 'relatedTicket') {
-          fromValue = convertRelatedIdsToTitles(fromValue);
-          toValue = convertRelatedIdsToTitles(toValue);
-        }
-        
-        changes.push({
-          field: k,
-          from: fromValue,
-          to: toValue
-        });
-      }
-    });
-    if (changes.length) {
-      b.history = b.history || [];
-      b.history.push({
-        type: 'edit',
-        at: new Date().toISOString(),
-        changes: changes,
-        user: currentUser.userName
-      });
-    }
-    showLoading();
-    callGAS('saveBug', { bug: b, userId: currentUser.userId })
-      .then(r => {
-        hideLoading();
-        if (!r.success) {
-          alert(r.message || '保存に失敗しました');
-          return;
-        }
-        alert('保存しました');
-        isEditMode = false;
-        const index = bugsCache.findIndex(x => x.id === id);
-        if (index !== -1) {
-          bugsCache[index] = b;
-        }
-        renderDetailContent(b, false);
-        renderHistory(b);
-      })
-      .catch(e => {
-        hideLoading();
-        alert('エラーが発生しました: ' + e.message);
-      });
-  }
-  function convertRelatedIdsToTitles(idsString) {
-    if (!idsString) return '(なし)';
-    const ids = idsString.split(',').filter(x => x);
-    if (ids.length === 0) return '(なし)';
-    const titles = ids.map(id => {
-      const bug = bugsCache.find(x => x.id === id);
-      return bug ? `No.${bug.bugNo} - ${bug.title}` : id;
-    });
-    return titles.join(', ');
-  }
-  function renderHistory(b) {
-    const box = document.getElementById('detail-history');
-    if (!box) return;
-    box.innerHTML = '';
-    if (!b.history || b.history.length === 0) {
-      box.textContent = '変更履歴はありません';
-      return;
-    }
-    const FIELD_LABELS = {
-      status: 'ステータス',
-      title: 'タイトル',
-      description: '説明',
-      reproducibility: '再現性',
-      severity: '重要度',
-      priority: '優先度',
-      reporter: '起票者',
-      assignee: '担当者',
-      environment: 'テスト環境',
-      version: 'バージョン情報',
-      relatedTicket: '関連チケット',
-      cause: '不具合原因',
-      fixPlan: '修正方針・内容',
-      impact: '影響範囲',
-      note: '備考'
-    };
-    b.history.slice().reverse().forEach(h => {
-      const wrap = document.createElement('div');
-      wrap.style.marginBottom = '8px';
-      const time = document.createElement('div');
-      time.style.fontSize = '12px';
-      time.style.color = '#9aa4b2';
-      time.textContent = new Date(h.at).toLocaleString() + (h.user ? ' - ' + h.user : '');
-      const body = document.createElement('div');
-      if (h.type === 'create') {
-        body.textContent = '新規作成';
-      }
-      if (h.type === 'edit' && Array.isArray(h.changes)) {
-        const ul = document.createElement('ul');
-        ul.style.marginLeft = '20px';
-        h.changes.forEach(c => {
-          const li = document.createElement('li');
-          if (typeof c === 'string') {
-            const key = c.split(':')[0];
-            const label = FIELD_LABELS[key] || key;
-            li.textContent = c.replace(key, label);
-          } else {
-            const label = FIELD_LABELS[c.field] || c.field;
-            li.textContent = `${label}：${c.from || '(空)'} → ${c.to || '(空)'}`;
-          }
-          ul.appendChild(li);
-        });
-        body.appendChild(document.createTextNode('編集'));
-        body.appendChild(ul);
-      }
-      wrap.appendChild(time);
-      wrap.appendChild(body);
-      box.appendChild(wrap);
-    });
-  }
-  function renderComments(b) {
-    const list = document.getElementById('comment-list');
-    const collapsed = document.getElementById('comment-collapsed');
-    if (!list || !collapsed) return;
-    const cs = (b.comments || []).slice().sort((a, c) => new Date(c.createdAt) - new Date(a.createdAt));
-    if (!cs.length) {
-      collapsed.textContent = 'コメントはありません';
-      collapsed.style.display = 'block';
-      list.style.display = 'none';
-      return;
-    }
-    collapsed.textContent = cs[0].text;
-    collapsed.style.display = commentsExpanded[b.id] ? 'none' : 'block';
-    list.innerHTML = '';
-    list.style.display = commentsExpanded[b.id] ? 'block' : 'none';
-    cs.forEach(c => {
-      const d = document.createElement('div');
-      d.className = 'comment-item';
-      d.innerHTML = `
-        <div style="flex:1;">
-          <div class="comment-text">${escapeHtml(c.text)}</div>
-          <div class="comment-meta">${new Date(c.createdAt).toLocaleString()}${c.userName ? ' - ' + c.userName : ''}</div>
-        </div>
-        <button class="btn" onclick="deleteComment('${b.id}','${c.id}')">削除</button>`;
-      list.appendChild(d);
-    });
-  }
-  function toggleComments(id) {
-    commentsExpanded[id] = !commentsExpanded[id];
-    const b = bugsCache.find(x => x.id === id);
-    if (b) renderComments(b);
-  }
-  function addComment(id) {
-    if (!currentUser) {
-      alert('ログインしてください');
-      return;
-    }
-    const ta = document.getElementById('comment-input');
-    if (!ta) return;
-    const t = ta.value.trim();
-    if (!t) {
-      alert('コメントを入力してください');
-      return;
-    }
-    const b = bugsCache.find(x => x.id === id);
-    if (!b) return;
-    b.comments = b.comments || [];
-    b.comments.push({
-      id: 'c_' + Math.random().toString(36).slice(2, 9),
-      text: t,
-      userName: currentUser.userName,
-      createdAt: new Date().toISOString()
-    });
-    ta.value = '';
-    commentsExpanded[id] = true;
-    showLoading();
-    callGAS('saveBug', { bug: b, userId: currentUser.userId })
-      .then(r => {
-        hideLoading();
-        if (!r.success) {
-          alert(r.message || 'コメントの保存に失敗しました');
-          return;
-        }
-        renderComments(b);
-      })
-      .catch(e => {
-        hideLoading();
-        alert('エラーが発生しました: ' + e.message);
-      });
-  }
-  function deleteComment(bugId, cid) {
-    if (!currentUser) {
-      alert('ログインしてください');
-      return;
-    }
-    if (!confirm('このコメントを削除しますか？')) {
-      return;
-    }
-    const b = bugsCache.find(x => x.id === bugId);
-    if (!b) return;
-    b.comments = b.comments.filter(c => c.id !== cid);
-    showLoading();
-    callGAS('saveBug', { bug: b, userId: currentUser.userId })
-      .then(r => {
-        hideLoading();
-        if (!r.success) {
-          alert(r.message || 'コメントの削除に失敗しました');
-          return;
-        }
-        renderComments(b);
-      })
-      .catch(e => {
-        hideLoading();
-        alert('エラーが発生しました: ' + e.message);
-      });
-  }
+constitems=container.querySelectorAll('.related-ticket-item');
+items.forEach(item=>{
+if(item.textContent.includes(bugId)||item.getAttribute('onclick').includes(bugId)){
+item.classList.toggle('selected');
+}
+});
+}
+
+functiongetSelectedRelatedTickets(containerId){
+constcontainer=document.getElementById(containerId);
+if(!container)return[];
+
+constselectedIds=[];
+constitems=container.querySelectorAll('.related-ticket-item.selected');
+
+items.forEach(item=>{
+constonclick=item.getAttribute('onclick');
+constmatch=onclick.match(/'([^']+)'\)$/);
+if(match&&match[1]){
+selectedIds.push(match[1]);
+}
+});
+
+returnselectedIds;
+}
+functionroute(){
+window.scrollTo(0,0);
+if(!window.__booted){
+window.__booted=true;
+document.getElementById('login').style.display='flex';
+document.getElementById('login').classList.add('active');
+return;
+}
+consthash=location.hash||'#list';
+constclean=hash.split('/')[0];
+if(!currentUser&&clean!=='#login'){
+location.hash='';
+return;
+}
+document.querySelectorAll('section').forEach(s=>{
+s.classList.remove('active');
+s.style.display='none';
+});
+constpg=document.querySelector(clean);
+if(pg){
+pg.classList.add('active');
+pg.style.display='block';
+}
+constnavNew=document.getElementById('nav-new');
+if(navNew){
+navNew.style.display=(clean==='#new'||clean==='#detail')?'none':'inline-block';
+}
+if(clean==='#new'){
+clearNewForm();
+}
+if(clean==='#list'){
+renderList();
+}
+if(clean==='#detail'&&hash.includes('/')){
+constbugId=hash.split('/')[1];
+showDetail(bugId);
+}
+}
+window.addEventListener('hashchange',route);
+window.addEventListener('load',route);
+functionrenderList(){
+constsearchInput=document.getElementById('search');
+constsearch=searchInput?searchInput.value.toLowerCase():'';
+consttbody=document.querySelector('#bugTabletbody');
+if(!tbody)return;
+tbody.innerHTML='';
+constsorted=bugsCache.slice().sort((a,b)=>(a.bugNo||0)-(b.bugNo||0));
+constfiltered=sorted.filter(b=>{
+if(!search)returntrue;
+constsearchFields=[
+b.title||'',
+b.description||'',
+b.status||'',
+b.severity||'',
+b.priority||'',
+b.assignee||'',
+b.reporterName||''
+].join('').toLowerCase();
+returnsearchFields.includes(search);
+});
+if(filtered.length===0){
+consttr=document.createElement('tr');
+tr.className='empty-row';
+tr.innerHTML='<tdcolspan="5">表示する項目がありません</td>';
+tbody.appendChild(tr);
+return;
+}
+filtered.forEach((b)=>{
+consttr=document.createElement('tr');
+tr.style.cursor='pointer';
+tr.innerHTML=`
+<td>No.${b.bugNo||'-'}</td>
+<td>${escapeHtml(b.title||'')}</td>
+<td>${escapeHtml(b.status||'')}</td>
+<td>${escapeHtml(b.severity||'')}</td>
+<td>${escapeHtml(b.priority||'')}</td>`;
+tr.addEventListener('click',()=>{
+go(`#detail/${b.id}`);
+});
+tbody.appendChild(tr);
+});
+}
+functionescapeHtml(s){
+return(s||'').replace(/[&<>"']/g,c=>
+({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+);
+}
+functiongoToRelatedBug(bugId){
+go(`#detail/${bugId}`);
+}
+
+functiongoBackToPrevious(){
+//履歴から現在のページを削除
+navigationHistory.pop();
+
+if(navigationHistory.length>0){
+//前のページに戻る
+constpreviousBugId=navigationHistory[navigationHistory.length-1];
+go(`#detail/${previousBugId}`);
+//showDetailが再度呼ばれるので、履歴重複を防ぐため最後の要素を削除
+navigationHistory.pop();
+}else{
+//履歴がない場合は一覧に戻る
+go('#list');
+}
+}
+functionaddBug(){
+if(!currentUser){
+alert('ログインしてください');
+return;
+}
+conststatus=document.getElementById('new-status').value;
+consttitle=document.getElementById('new-title').value.trim();
+constdescription=document.getElementById('new-desc').value.trim();
+constassignee=document.getElementById('new-assignee').value.trim();
+constseverity=document.getElementById('new-severity').value;
+constpriority=document.getElementById('new-priority').value;
+if(!status){
+alert('ステータスを選択してください');
+return;
+}
+if(!title){
+alert('タイトルを入力してください');
+return;
+}
+if(!description){
+alert('説明を入力してください');
+return;
+}
+if(!assignee){
+alert('担当者を入力してください');
+return;
+}
+if(!severity){
+alert('重要度を選択してください');
+return;
+}
+if(!priority){
+alert('優先度を選択してください');
+return;
+}
+
+constselectedRelated=getSelectedRelatedTickets('new-related-container');
+constrelatedId=selectedRelated.join(',');
+
+constb={
+id:'b_'+Math.random().toString(36).slice(2,9)+'_'+Date.now(),
+bugNo:0,
+status:status,
+title:title,
+description:description,
+reproducibility:document.getElementById('new-repro').value,
+reporter:currentUser.userId,
+reporterName:currentUser.userName,
+assignee:assignee,
+severity:severity,
+priority:priority,
+environment:document.getElementById('new-env').value,
+version:document.getElementById('new-version').value,
+relatedTicket:relatedId,
+cause:'',
+fixPlan:'',
+impact:'',
+note:'',
+comments:[],
+history:[{
+type:'create',
+at:newDate().toISOString(),
+user:currentUser.userName,
+data:{}
+}],
+createdAt:newDate().toISOString()
+};
+showLoading();
+callGAS('saveBug',{bug:b,userId:currentUser.userId})
+.then(r=>{
+hideLoading();
+if(!r.success){
+alert(r.message||'保存に失敗しました');
+return;
+}
+alert('登録しました');
+loadBugsFromServer();
+})
+.catch(e=>{
+hideLoading();
+alert('エラーが発生しました:'+e.message);
+});
+}
+functionshowDetail(id,fromHistory){
+constb=bugsCache.find(x=>x.id===id);
+currentDetailId=id;
+isEditMode=false;
+constarea=document.getElementById('detail-content');
+if(!b){
+area.innerHTML='<p>見つかりません</p>';
+return;
+}
+//履歴管理（ブラウザの戻るボタンから来た場合は追加しない）
+if(!fromHistory){
+navigationHistory.push(id);
+}
+b.comments=b.comments||[];
+b.history=b.history||[];
+renderDetailContent(b,false);
+renderHistory(b);
+renderComments(b);
+constcommentInput=document.getElementById('comment-input');
+if(commentInput)commentInput.value='';
+}
+functionrenderDetailContent(b,editMode){
+constarea=document.getElementById('detail-content');
+constcanEdit=canEditBug(b);
+constcanEditDev=canEditDevFields();
+if(editMode&&!canEdit){
+editMode=false;
+}
+constdisabled=editMode?'':'disabled';
+constreadonlyStyle=editMode?'':'background:#0f1724;cursor:not-allowed;';
+constdevDisabled=(editMode&&canEditDev)?'':'disabled';
+constdevReadonlyStyle=(editMode&&canEditDev)?'':'background:#0f1724;cursor:not-allowed;';
+
+letrelatedHtml='';
+if(editMode){
+relatedHtml='<divid="detail-related-container"></div>';
+}else{
+if(b.relatedTicket){
+constrelatedIds=b.relatedTicket.split(',').filter(x=>x);
+if(relatedIds.length>0){
+relatedHtml='<divstyle="margin-top:4px;">';
+relatedIds.forEach(relId=>{
+constrelatedBug=bugsCache.find(x=>x.id===relId);
+if(relatedBug){
+relatedHtml+=`<div><ahref="javascript:void(0)"onclick="goToRelatedBug('${relatedBug.id}')"class="bug-link">No.${relatedBug.bugNo}-${escapeHtml(relatedBug.title)}</a></div>`;
+}
+});
+relatedHtml+='</div>';
+}else{
+relatedHtml='<divstyle="margin-top:4px;">なし</div>';
+}
+}else{
+relatedHtml='<divstyle="margin-top:4px;">なし</div>';
+}
+}
+
+area.innerHTML=`
+<divstyle="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+<h2style="margin:0;">バグ詳細(No.${b.bugNo||'-'})</h2>
+<divstyle="display:flex;gap:8px;">
+${canEdit?
+(editMode?
+`<buttonclass="btn"onclick="saveDetail('${b.id}')">保存</button>
+<buttonclass="btn"onclick="cancelEdit('${b.id}')">キャンセル</button>`:
+`<buttonclass="btn"onclick="toggleEditMode('${b.id}')">編集</button>
+<buttonclass="btn"onclick="goBackToPrevious()">戻る</button>`
+):
+`<buttonclass="btn"onclick="goBackToPrevious()">戻る</button>`
+}
+</div>
+</div>
+<labelclass="required">ステータス</label>
+<selectid="detail-status"style="width:260px;${readonlyStyle}"${disabled}>
+<option${b.status==='OPEN(新規)'?'selected':''}>OPEN(新規)</option>
+<option${b.status==='ACCEPT(アサイン済み)'?'selected':''}>ACCEPT(アサイン済み)</option>
+<option${b.status==='RESOLVED(対象方法確定)'?'selected':''}>RESOLVED(対象方法確定)</option>
+<option${b.status==='FIXED(修正済み)'?'selected':''}>FIXED(修正済み)</option>
+<option${b.status==='CLOSED(解消)'?'selected':''}>CLOSED(解消)</option>
+<option${b.status==='INVALID(不具合ではない)'?'selected':''}>INVALID(不具合ではない)</option>
+<option${b.status==='WONTFIX(仕様扱い)'?'selected':''}>WONTFIX(仕様扱い)</option>
+<option${b.status==='DUPLICATE(重複している不具合)'?'selected':''}>DUPLICATE(重複している不具合)</option>
+<option${b.status==='WORKSFORME(再現しない)'?'selected':''}>WORKSFORME(再現しない)</option>
+<option${b.status==='LATER(次期バージョンで対応)'?'selected':''}>LATER(次期バージョンで対応)</option>
+<option${b.status==='REMIND(制限事項扱い)'?'selected':''}>REMIND(制限事項扱い)</option>
+<option${b.status==='REOPENED(再オープン)'?'selected':''}>REOPENED(再オープン)</option>
+</select>
+<labelclass="required">タイトル</label>
+<inputid="detail-title"value="${escapeHtml(b.title||'')}"${disabled}style="${readonlyStyle}"/>
+<labelclass="required">説明</label>
+<textareaid="detail-desc"rows="6"${disabled}style="${readonlyStyle}">${escapeHtml(b.description||'')}</textarea>
+<label>再現性</label>
+<inputid="detail-repro"value="${escapeHtml(b.reproducibility||'')}"${disabled}style="${readonlyStyle}"/>
+<label>起票者</label>
+<inputid="detail-reporter"value="${escapeHtml(b.reporterName||b.reporter||'')}"readonlystyle="background:#0f1724;cursor:not-allowed;"/>
+<labelclass="required">担当者</label>
+<inputid="detail-assignee"value="${escapeHtml(b.assignee||'')}"${disabled}style="${readonlyStyle}"/>
+<labelclass="required">重要度</label>
+<selectid="detail-severity"style="width:200px;${readonlyStyle}"${disabled}>
+<optionvalue="">選択してください</option>
+<optionvalue="S(致命的)"${b.severity==='S(致命的)'?'selected':''}>S(致命的)</option>
+<optionvalue="A(機能上問題（回避策なし）)"${b.severity==='A(機能上問題（回避策なし）)'?'selected':''}>A(機能上問題（回避策なし）)</option>
+<optionvalue="B(機能上問題（回避策あり）)"${b.severity==='B(機能上問題（回避策あり）)'?'selected':''}>B(機能上問題（回避策あり）)</option>
+<optionvalue="C(商品性上問題)"${b.severity==='C(商品性上問題)'?'selected':''}>C(商品性上問題)</option>
+<optionvalue="D(軽微)"${b.severity==='D(軽微)'?'selected':''}>D(軽微)</option>
+</select>
+<labelclass="required">優先度</label>
+<selectid="detail-priority"style="width:120px;${readonlyStyle}"${disabled}>
+<optionvalue="">選択してください</option>
+<optionvalue="High"${b.priority==='High'?'selected':''}>High</option>
+<optionvalue="Medium"${b.priority==='Medium'?'selected':''}>Medium</option>
+<optionvalue="Low"${b.priority==='Low'?'selected':''}>Low</option>
+</select>
+<label>テスト環境</label>
+<inputid="detail-env"value="${escapeHtml(b.environment||'')}"${disabled}style="${readonlyStyle}"/>
+<label>バージョン情報</label>
+<inputid="detail-version"value="${escapeHtml(b.version||'')}"${disabled}style="${readonlyStyle}"/>
+<label>関連チケット（複数選択可）</label>
+${relatedHtml}
+<label>不具合原因（開発者記入）</label>
+<textareaid="detail-cause"rows="4"${devDisabled}style="${devReadonlyStyle}">${escapeHtml(b.cause||'')}</textarea>
+<label>修正方針・内容（開発者記入）</label>
+<textareaid="detail-fixplan"rows="4"${devDisabled}style="${devReadonlyStyle}">${escapeHtml(b.fixPlan||'')}</textarea>
+<label>影響範囲（開発者記入）</label>
+<textareaid="detail-impact"rows="4"${devDisabled}style="${devReadonlyStyle}">${escapeHtml(b.impact||'')}</textarea>
+<label>備考（開発者記入）</label>
+<textareaid="detail-note"rows="4"${devDisabled}style="${devReadonlyStyle}">${escapeHtml(b.note||'')}</textarea>
+`;
+
+//編集モードの場合、関連チケット選択UIを表示
+if(editMode){
+constrelatedIds=(b.relatedTicket||'').split(',').filter(x=>x);
+populateRelatedTickets('detail-related-container',b.id,relatedIds);
+}
+}
+functiontoggleEditMode(id){
+constb=bugsCache.find(x=>x.id===id);
+if(!b)return;
+if(!canEditBug(b)){
+alert('このバグを編集する権限がありません');
+return;
+}
+isEditMode=true;
+renderDetailContent(b,true);
+renderHistory(b);
+}
+functioncancelEdit(id){
+constb=bugsCache.find(x=>x.id===id);
+if(!b)return;
+isEditMode=false;
+renderDetailContent(b,false);
+renderHistory(b);
+}
+functionsaveDetail(id){
+if(!currentUser){
+alert('ログインしてください');
+return;
+}
+constb=bugsCache.find(x=>x.id===id);
+if(!b){
+alert('対象データが見つかりません');
+return;
+}
+if(!canEditBug(b)){
+alert('このバグを編集する権限がありません');
+return;
+}
+constv=(id)=>{
+constel=document.getElementById(id);
+returnel?el.value.trim():'';
+};
+conststatus=v('detail-status');
+consttitle=v('detail-title');
+constdescription=v('detail-desc');
+constassignee=v('detail-assignee');
+constseverity=v('detail-severity');
+constpriority=v('detail-priority');
+if(!status){
+alert('ステータスを選択してください');
+return;
+}
+if(!title){
+alert('タイトルを入力してください');
+return;
+}
+if(!description){
+alert('説明を入力してください');
+return;
+}
+if(!assignee){
+alert('担当者を入力してください');
+return;
+}
+if(!severity){
+alert('重要度を選択してください');
+return;
+}
+if(!priority){
+alert('優先度を選択してください');
+return;
+}
+constbefore=JSON.parse(JSON.stringify(b));
+b.status=status;
+b.title=title;
+b.description=description;
+b.reproducibility=v('detail-repro');
+b.assignee=assignee;
+b.severity=severity;
+b.priority=priority;
+b.environment=v('detail-env');
+b.version=v('detail-version');
+
+constselectedRelated=getSelectedRelatedTickets('detail-related-container');
+b.relatedTicket=selectedRelated.join(',');
+
+if(canEditDevFields()){
+b.cause=v('detail-cause');
+b.fixPlan=v('detail-fixplan');
+b.impact=v('detail-impact');
+b.note=v('detail-note');
+}
+constchanges=[];
+constFIELD_LABELS={
+status:'ステータス',
+title:'タイトル',
+description:'説明',
+reproducibility:'再現性',
+severity:'重要度',
+priority:'優先度',
+assignee:'担当者',
+environment:'テスト環境',
+version:'バージョン情報',
+relatedTicket:'関連チケット',
+cause:'不具合原因',
+fixPlan:'修正方針・内容',
+impact:'影響範囲',
+note:'備考'
+};
+Object.keys(FIELD_LABELS).forEach(k=>{
+if(typeofb[k]==='string'&&before[k]!==b[k]){
+letfromValue=before[k]||'';
+lettoValue=b[k]||'';
+
+//関連チケットの場合、IDをタイトルに変換
+if(k==='relatedTicket'){
+fromValue=convertRelatedIdsToTitles(fromValue);
+toValue=convertRelatedIdsToTitles(toValue);
+}
+
+changes.push({
+field:k,
+from:fromValue,
+to:toValue
+});
+}
+});
+if(changes.length){
+b.history=b.history||[];
+b.history.push({
+type:'edit',
+at:newDate().toISOString(),
+changes:changes,
+user:currentUser.userName
+});
+}
+showLoading();
+callGAS('saveBug',{bug:b,userId:currentUser.userId})
+.then(r=>{
+hideLoading();
+if(!r.success){
+alert(r.message||'保存に失敗しました');
+return;
+}
+alert('保存しました');
+isEditMode=false;
+constindex=bugsCache.findIndex(x=>x.id===id);
+if(index!==-1){
+bugsCache[index]=b;
+}
+renderDetailContent(b,false);
+renderHistory(b);
+})
+.catch(e=>{
+hideLoading();
+alert('エラーが発生しました:'+e.message);
+});
+}
+functionconvertRelatedIdsToTitles(idsString){
+if(!idsString)return'(なし)';
+constids=idsString.split(',').filter(x=>x);
+if(ids.length===0)return'(なし)';
+consttitles=ids.map(id=>{
+constbug=bugsCache.find(x=>x.id===id);
+returnbug?`No.${bug.bugNo}-${bug.title}`:id;
+});
+returntitles.join(',');
+}
+functionrenderHistory(b){
+constbox=document.getElementById('detail-history');
+if(!box)return;
+box.innerHTML='';
+if(!b.history||b.history.length===0){
+box.textContent='変更履歴はありません';
+return;
+}
+constFIELD_LABELS={
+status:'ステータス',
+title:'タイトル',
+description:'説明',
+reproducibility:'再現性',
+severity:'重要度',
+priority:'優先度',
+reporter:'起票者',
+assignee:'担当者',
+environment:'テスト環境',
+version:'バージョン情報',
+relatedTicket:'関連チケット',
+cause:'不具合原因',
+fixPlan:'修正方針・内容',
+impact:'影響範囲',
+note:'備考'
+};
+b.history.slice().reverse().forEach(h=>{
+constwrap=document.createElement('div');
+wrap.style.marginBottom='8px';
+consttime=document.createElement('div');
+time.style.fontSize='12px';
+time.style.color='#9aa4b2';
+time.textContent=newDate(h.at).toLocaleString()+(h.user?'-'+h.user:'');
+constbody=document.createElement('div');
+if(h.type==='create'){
+body.textContent='新規作成';
+}
+if(h.type==='edit'&&Array.isArray(h.changes)){
+constul=document.createElement('ul');
+ul.style.marginLeft='20px';
+h.changes.forEach(c=>{
+constli=document.createElement('li');
+if(typeofc==='string'){
+constkey=c.split(':')[0];
+constlabel=FIELD_LABELS[key]||key;
+li.textContent=c.replace(key,label);
+}else{
+constlabel=FIELD_LABELS[c.field]||c.field;
+li.textContent=`${label}：${c.from||'(空)'}→${c.to||'(空)'}`;
+}
+ul.appendChild(li);
+});
+body.appendChild(document.createTextNode('編集'));
+body.appendChild(ul);
+}
+wrap.appendChild(time);
+wrap.appendChild(body);
+box.appendChild(wrap);
+});
+}
+functionrenderComments(b){
+constlist=document.getElementById('comment-list');
+constcollapsed=document.getElementById('comment-collapsed');
+if(!list||!collapsed)return;
+constcs=(b.comments||[]).slice().sort((a,c)=>newDate(c.createdAt)-newDate(a.createdAt));
+if(!cs.length){
+collapsed.textContent='コメントはありません';
+collapsed.style.display='block';
+list.style.display='none';
+return;
+}
+collapsed.textContent=cs[0].text;
+collapsed.style.display=commentsExpanded[b.id]?'none':'block';
+list.innerHTML='';
+list.style.display=commentsExpanded[b.id]?'block':'none';
+cs.forEach(c=>{
+constd=document.createElement('div');
+d.className='comment-item';
+d.innerHTML=`
+<divstyle="flex:1;">
+<divclass="comment-text">${escapeHtml(c.text)}</div>
+<divclass="comment-meta">${newDate(c.createdAt).toLocaleString()}${c.userName?'-'+c.userName:''}</div>
+</div>
+<buttonclass="btn"onclick="deleteComment('${b.id}','${c.id}')">削除</button>`;
+list.appendChild(d);
+});
+}
+functiontoggleComments(id){
+commentsExpanded[id]=!commentsExpanded[id];
+constb=bugsCache.find(x=>x.id===id);
+if(b)renderComments(b);
+}
+functionaddComment(id){
+if(!currentUser){
+alert('ログインしてください');
+return;
+}
+constta=document.getElementById('comment-input');
+if(!ta)return;
+constt=ta.value.trim();
+if(!t){
+alert('コメントを入力してください');
+return;
+}
+constb=bugsCache.find(x=>x.id===id);
+if(!b)return;
+b.comments=b.comments||[];
+b.comments.push({
+id:'c_'+Math.random().toString(36).slice(2,9),
+text:t,
+userName:currentUser.userName,
+createdAt:newDate().toISOString()
+});
+ta.value='';
+commentsExpanded[id]=true;
+showLoading();
+callGAS('saveBug',{bug:b,userId:currentUser.userId})
+.then(r=>{
+hideLoading();
+if(!r.success){
+alert(r.message||'コメントの保存に失敗しました');
+return;
+}
+renderComments(b);
+})
+.catch(e=>{
+hideLoading();
+alert('エラーが発生しました:'+e.message);
+});
+}
+functiondeleteComment(bugId,cid){
+if(!currentUser){
+alert('ログインしてください');
+return;
+}
+if(!confirm('このコメントを削除しますか？')){
+return;
+}
+constb=bugsCache.find(x=>x.id===bugId);
+if(!b)return;
+b.comments=b.comments.filter(c=>c.id!==cid);
+showLoading();
+callGAS('saveBug',{bug:b,userId:currentUser.userId})
+.then(r=>{
+hideLoading();
+if(!r.success){
+alert(r.message||'コメントの削除に失敗しました');
+return;
+}
+renderComments(b);
+})
+.catch(e=>{
+hideLoading();
+alert('エラーが発生しました:'+e.message);
+});
+}
 </script>
 </body>
 </html>
