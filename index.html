@@ -445,12 +445,12 @@ html+='<divstyle="padding:8px;color:#9aa4b2;">関連付け可能なチケット�
 bugsCache.forEach(bug=>{
 if(bug.id===currentBugId)return;//自分自身は除外
 constisSelected=selected.includes(bug.id);
-html+=`
-<divclass="related-ticket-item${isSelected?'selected':''}"
-onclick="toggleRelatedTicket('${containerId}','${bug.id}')">
-<spanclass="related-ticket-checkbox"></span>
-<span>No.${bug.bugNo}-${escapeHtml(bug.title)}</span>
-</div>`;
+html += `
+  <div class="related-ticket-item ${isSelected ? 'selected' : ''}" 
+       onclick="toggleRelatedTicket('${containerId}','${bug.id}')">
+    <span class="related-ticket-checkbox"></span>
+    <span>No.${bug.bugNo} - ${escapeHtml(bug.title)}</span>
+  </div>`;
 });
 }
 html+='</div>';
