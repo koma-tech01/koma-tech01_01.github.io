@@ -229,10 +229,10 @@
     <input id="new-env" placeholder="テスト環境" />
     <label for="new-version">バージョン情報</label>
     <input id="new-version" placeholder="バージョン情報" />
-    <label for="new-related">関連チケット</label>
-    <select id="new-related" class="short-select">
-      <option value="">なし</option>
-    </select>
+    <label for="new-related">関連チケット（複数選択可）</label>
+    　<select id="new-related" class="short-select" multiple style="height:120px;">
+    　 <option value="">なし</option>
+    　</select>
     <div style="margin-top:8px;display:flex;gap:8px;">
       <button class="btn" onclick="addBug()">登録</button>
       <button class="btn" onclick="go('#list')" style="background:#6c757d;">キャンセル</button>
@@ -387,17 +387,17 @@
     if (severity) severity.value = '';
     populateRelatedTickets('new-related');
   }
-  function populateRelatedTickets(selectId) {
-    const selectEl = document.getElementById(selectId);
-    if (!selectEl) return;
-    selectEl.innerHTML = '<option value="">なし</option>';
-    bugsCache.forEach(bug => {
-      const option = document.createElement('option');
-      option.value = bug.id;
-      option.textContent = `No.${bug.bugNo} - ${bug.title}`;
-      selectEl.appendChild(option);
-    });
-  }
+　function populateRelatedTickets(selectId) {
+  　const selectEl = document.getElementById(selectId);
+  　if (!selectEl) return;
+  　selectEl.innerHTML = '';
+ 　 bugsCache.forEach(bug => {
+   　 const option = document.createElement('option');
+    　option.value = bug.id;
+   　 option.textContent = `No.${bug.bugNo} - ${bug.title}`;
+  　  selectEl.appendChild(option);
+　  });
+　}
   function route() {
     window.scrollTo(0, 0);
     if (!window.__booted) {
@@ -521,8 +521,10 @@
       return;
     }
     const relatedSelect = document.getElementById('new-related');
-    const relatedId = relatedSelect ? relatedSelect.value : '';
-    const b = {
+　　const selectedOptions = relatedSelect ? Array.from(relatedSelect.selectedOptions).map(opt => opt.value) : [];
+　　const relatedId = selectedOptions.join(','); // カンマ区切りで保存
+
+　　const b = {
       id: 'b_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now(),
       bugNo: 0,
       status: status,
@@ -536,7 +538,7 @@
       priority: priority,
       environment: document.getElementById('new-env').value,
       version: document.getElementById('new-version').value,
-      relatedTicket: relatedId,
+      relatedTicket: relatedId, // 複数IDをカンマ区切りで保存
       cause: '',
       fixPlan: '',
       impact: '',
@@ -595,26 +597,34 @@
     const devDisabled = (editMode && canEditDev) ? '' : 'disabled';
     const devReadonlyStyle = (editMode && canEditDev) ? '' : 'background:#0f1724;cursor:not-allowed;';
     
-    let relatedHtml = '';
+  let relatedHtml = '';
     if (editMode) {
-      relatedHtml = '<select id="detail-related" style="width:260px;' + readonlyStyle + '" ' + disabled + '><option value="">なし</option>';
+      relatedHtml = '<select id="detail-related" multiple style="width:100%; height:120px;' + readonlyStyle + '" ' + disabled + '>';
       bugsCache.forEach(bug => {
-        const selected = bug.id === b.relatedTicket ? 'selected' : '';
-        relatedHtml += `<option value="${bug.id}" ${selected}>No.${bug.bugNo} - ${escapeHtml(bug.title)}</option>`;
-      });
-      relatedHtml += '</select>';
+    const relatedIds = (b.relatedTicket || '').split(',').filter(x => x);
+    const selected = relatedIds.includes(bug.id) ? 'selected' : '';
+      relatedHtml += `<option value="${bug.id}" ${selected}>No.${bug.bugNo} - ${escapeHtml(bug.title)}</option>`;
+    });
+    relatedHtml += '</select>';
     } else {
-      if (b.relatedTicket) {
-        const relatedBug = bugsCache.find(x => x.id === b.relatedTicket);
-        if (relatedBug) {
-          relatedHtml = `<div style="margin-top:4px;"><a href="#detail/${relatedBug.id}" class="bug-link">No.${relatedBug.bugNo} - ${escapeHtml(relatedBug.title)}</a></div>`;
-        } else {
-          relatedHtml = '<div style="margin-top:4px;">なし</div>';
-        }
+    if (b.relatedTicket) {
+    const relatedIds = b.relatedTicket.split(',').filter(x => x);
+      if (relatedIds.length > 0) {
+        relatedHtml = '<div style="margin-top:4px;">';
+        relatedIds.forEach(relId => {
+          const relatedBug = bugsCache.find(x => x.id === relId);
+          if (relatedBug) {
+            relatedHtml += `<div><a href="#detail/${relatedBug.id}" class="bug-link">No.${relatedBug.bugNo} - ${escapeHtml(relatedBug.title)}</a></div>`;
+          }
+        });
+        relatedHtml += '</div>';
       } else {
         relatedHtml = '<div style="margin-top:4px;">なし</div>';
       }
+    } else {
+      relatedHtml = '<div style="margin-top:4px;">なし</div>';
     }
+  }
     
     area.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
@@ -765,12 +775,11 @@
     b.environment = v('detail-env');
     b.version = v('detail-version');
     const relatedSelect = document.getElementById('detail-related');
-    b.relatedTicket = relatedSelect ? relatedSelect.value : '';
-    if (canEditDevFields()) {
-      b.cause = v('detail-cause');
-      b.fixPlan = v('detail-fixplan');
-      b.impact = v('detail-impact');
-      b.note = v('detail-note');
+    if (relatedSelect) {
+     const selectedOptions = Array.from(relatedSelect.selectedOptions).map(opt => opt.value);
+     b.relatedTicket = selectedOptions.join(',');
+    } else {
+     b.relatedTicket = '';
     }
     const changes = [];
     const FIELD_LABELS = {
