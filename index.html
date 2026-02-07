@@ -24,15 +24,16 @@
       border-bottom:1px solid #2a3548; padding:12px 8px; vertical-align:middle;
       color:#e2e8f0; overflow:hidden; text-overflow:ellipsis;
     }
-    th:nth-child(1), td:nth-child(1) { width:80px; }
+    th:nth-child(1), td:nth-child(1) { width:80px; text-align:left; }
     th:nth-child(2), td:nth-child(2) {
       width:600px;
       white-space:normal;
       word-break:break-word;
+      text-align:left;
     }
-    th:nth-child(3), td:nth-child(3) { width:150px; }
-    th:nth-child(4), td:nth-child(4) { width:150px; }
-    th:nth-child(5), td:nth-child(5) { width:120px; text-align:center; }
+    th:nth-child(3), td:nth-child(3) { width:200px; text-align:left; }
+    th:nth-child(4), td:nth-child(4) { width:200px; text-align:left; }
+    th:nth-child(5), td:nth-child(5) { width:120px; text-align:left; }
     tr:hover { background:#1a2536; }
     .btn { padding:8px 12px; background:#1e90ff; color:#fff; border:none; border-radius:6px; cursor:pointer; }
     #new, #detail-content { max-width: 800px; margin: 0 auto; padding: 0 20px; }
@@ -634,8 +635,19 @@ function getSelectedRelatedTickets(containerId) {
      return;
    }
   
-   const selectedRelated = getSelectedRelatedTickets('new-related-container');
-   const relatedId = selectedRelated.join(',');
+   const selectedRelated = getSelectedRelatedTickets('detail-related-container');
+
+// 既存の関連チケットを取得
+   const existingRelatedIds = (before.relatedTicket || '').split(',').filter(x => x);
+
+// 現在のユーザーが見えないチケットIDを抽出（保持すべきチケット）
+   const invisibleTickets = existingRelatedIds.filter(relId => {
+     return !bugsCache.some(bug => bug.id === relId);
+   });
+
+// 新しく選択されたチケットと、見えないチケットをマージ
+   const allRelatedTickets = [...new Set([...selectedRelated, ...invisibleTickets])];
+     b.relatedTicket = allRelatedTickets.join(',');
   
    const b = {
      id: 'b_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now(),
