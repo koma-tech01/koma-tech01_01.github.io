@@ -323,6 +323,8 @@
   let commentsExpanded = {};
   let isEditMode = false;
   let navigationHistory = []; 
+  let originalBugData = {};
+    
   function canEditDevFields() {
     if (!currentUser) return false;
     return currentUser.userType === 'admin';
@@ -712,10 +714,15 @@ function getSelectedRelatedTickets(containerId) {
      area.innerHTML = '<p>見つかりません</p>';
      return;
    }
-  // 履歴管理（ブラウザの戻るボタンから来た場合は追加しない）
+   
+   // ★編集前のオリジナルデータを保存
+   originalBugData[id] = JSON.parse(JSON.stringify(b));
+   
+   // 履歴管理（ブラウザの戻るボタンから来た場合は追加しない）
    if (!fromHistory) {
      navigationHistory.push(id);
    }
+   
    b.comments = b.comments || [];
    b.history = b.history || [];
    renderDetailContent(b, false);
@@ -903,7 +910,10 @@ function getSelectedRelatedTickets(containerId) {
       alert('優先度を選択してください');
       return;
     }
-    const before = JSON.parse(JSON.stringify(b));
+    
+    // ★オリジナルデータから before を取得
+    const before = originalBugData[id] ? JSON.parse(JSON.stringify(originalBugData[id])) : JSON.parse(JSON.stringify(b));
+    
     b.status = status;
     b.title = title;
     b.description = description;
@@ -915,7 +925,18 @@ function getSelectedRelatedTickets(containerId) {
     b.version = v('detail-version');
   
     const selectedRelated = getSelectedRelatedTickets('detail-related-container');
-    b.relatedTicket = selectedRelated.join(',');
+    
+    // ★オリジナルデータから既存の関連チケットを取得
+    const existingRelatedIds = (before.relatedTicket || '').split(',').filter(x => x);
+    
+    // 現在のユーザーが見えないチケットIDを抽出（保持すべきチケット）
+    const invisibleTickets = existingRelatedIds.filter(relId => {
+      return !bugsCache.some(bug => bug.id === relId);
+    });
+    
+    // 新しく選択されたチケットと、見えないチケットをマージ
+    const allRelatedTickets = [...new Set([...selectedRelated, ...invisibleTickets])];
+    b.relatedTicket = allRelatedTickets.join(',');
     
     if (canEditDevFields()) {
       b.cause = v('detail-cause');
