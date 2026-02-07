@@ -647,19 +647,9 @@ function getSelectedRelatedTickets(containerId) {
      return;
    }
   
-   const selectedRelated = getSelectedRelatedTickets('detail-related-container');
-
-// 既存の関連チケットを取得
-   const existingRelatedIds = (before.relatedTicket || '').split(',').filter(x => x);
-
-// 現在のユーザーが見えないチケットIDを抽出（保持すべきチケット）
-   const invisibleTickets = existingRelatedIds.filter(relId => {
-     return !bugsCache.some(bug => bug.id === relId);
-   });
-
-// 新しく選択されたチケットと、見えないチケットをマージ
-   const allRelatedTickets = [...new Set([...selectedRelated, ...invisibleTickets])];
-     b.relatedTicket = allRelatedTickets.join(',');
+   // ★修正: 新規作成なので selectedRelated をそのまま使う
+   const selectedRelated = getSelectedRelatedTickets('new-related-container');
+   const relatedId = selectedRelated.join(',');
   
    const b = {
      id: 'b_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now(),
