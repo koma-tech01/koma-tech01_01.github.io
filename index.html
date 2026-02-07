@@ -435,34 +435,44 @@
     if (severity) severity.value = '';
     populateRelatedTickets('new-related-container', null, []);
   }
+
   function populateRelatedTickets(containerId, currentBugId, selectedIds) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
+    const container = document.getElementById(containerId);
+    if (!container) return;
   
-  const selected = selectedIds || [];
+    const selected = selectedIds || [];
   
-  let html = '<div class="related-tickets-selector">';
+    let html = '<div class="related-tickets-selector">';
   
-  if (bugsCache.length === 0) {
-    html += '<div style="padding:8px;color:#9aa4b2;">関連付け可能なチケットがありません</div>';
-  } else {
-    bugsCache.forEach(bug => {
-      if (bug.id === currentBugId) return;
-      
-      const isSelected = selected.includes(bug.id);
-      const selectedClass = isSelected ? ' selected' : '';
-      
-      html += '<div class="related-ticket-item' + selectedClass + '" ';
-      html += 'onclick="toggleRelatedTicket(\'' + containerId + '\',\'' + bug.id + '\')">';
-      html += '<span class="related-ticket-checkbox"></span>';
-      html += '<span>No.' + bug.bugNo + ' - ' + escapeHtml(bug.title) + '</span>';
+  // 見えないチケットの数をカウント
+    const invisibleCount = selected.filter(id => !bugsCache.some(b => b.id === id)).length;
+  
+    if (invisibleCount > 0) {
+      html += '<div style="padding:8px;color:#9aa4b2;background:rgba(255,255,255,0.05);border-radius:4px;margin-bottom:8px;">';
+      html += `他のユーザーが設定した関連チケット: ${invisibleCount}件（編集不可）`;
       html += '</div>';
-    });
-  }
+    }
   
-  html += '</div>';
-  container.innerHTML = html;
-}
+    if (bugsCache.length === 0) {
+      html += '<div style="padding:8px;color:#9aa4b2;">関連付け可能なチケットがありません</div>';
+    } else {
+      bugsCache.forEach(bug => {
+        if (bug.id === currentBugId) return;
+      
+        const isSelected = selected.includes(bug.id);
+        const selectedClass = isSelected ? ' selected' : '';
+      
+        html += '<div class="related-ticket-item' + selectedClass + '" ';
+        html += 'onclick="toggleRelatedTicket(\'' + containerId + '\',\'' + bug.id + '\')">';
+        html += '<span class="related-ticket-checkbox"></span>';
+        html += '<span>No.' + bug.bugNo + ' - ' + escapeHtml(bug.title) + '</span>';
+        html += '</div>';
+      });
+    }
+  
+    html += '</div>';
+    container.innerHTML = html;
+  }
 
 function toggleRelatedTicket(containerId, bugId) {
   const container = document.getElementById(containerId);
